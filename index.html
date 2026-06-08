@@ -1,375 +1,377 @@
 <!DOCTYPE html>
 <!-- ================================================================
-     DRAKON BAZASI  -  1-versiya
+     DRAKON QASRI  -  2-versiya (zamonaviy dizayn)
      Telefonda o'ynaladigan baza qurish o'yini.
-     Bu fayl butun o'yin. Brauzerda (Chrome) ochib o'ynang.
-     Har bir qism o'zbek tilida izohlangan.
+     Butun grafika SVG (vektor) bilan chizilgan - har qanday ekranda toza.
      ================================================================ -->
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Drakon Bazasi</title>
+  <title>Drakon Qasri</title>
 
-  <!-- ===================== CSS = O'YIN KIYIMI ===================== -->
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:Arial, sans-serif; }
-    body {
-      background:#1d2330; color:#fff; height:100vh; overflow:hidden;
-      display:flex; flex-direction:column; user-select:none;
-    }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
+      font-family:'Segoe UI',system-ui,Arial,sans-serif;}
+    body{background:#0b0f1a;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;user-select:none;}
 
-    /* --- Yuqoridagi resurs paneli --- */
-    .resurslar {
-      display:flex; justify-content:space-around; gap:6px;
-      background:#0f1420; padding:10px 6px; box-shadow:0 2px 8px rgba(0,0,0,.5);
-    }
-    .resurs { text-align:center; font-size:14px; }
-    .resurs b { display:block; font-size:18px; }
-    .yogoch b { color:#9ccc65; }
-    .gosht  b { color:#ff8a65; }
-    .pul    b { color:#ffd54a; }
+    /* ===== Yuqori HUD (resurslar paneli - shisha effekti) ===== */
+    .hud{display:flex;gap:8px;padding:10px;background:rgba(10,14,26,.85);
+      backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.6);z-index:5;}
+    .chip{flex:1;display:flex;align-items:center;gap:8px;justify-content:center;
+      background:linear-gradient(180deg,#1c2438,#141a2a);border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;padding:8px 6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+    .chip .ico{font-size:20px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
+    .chip .val{display:flex;flex-direction:column;line-height:1.1;}
+    .chip .val small{font-size:10px;color:#8a94ad;}
+    .chip .val b{font-size:16px;}
+    .yog .val b{color:#a3d977;} .gos .val b{color:#ff9d6e;} .pul .val b{color:#ffd34a;}
 
-    /* --- Baza maydoni (o'yin ko'rinadigan joy) --- */
-    .baza {
-      flex:1; position:relative;
-      background:
-        linear-gradient(#5db6e6 0%, #5db6e6 40%, #79c34a 40%, #4e8c2a 100%);
-      overflow:hidden;
-    }
-    /* O'rmon - chap tomonda daraxtlar */
-    .ormon { position:absolute; left:0; bottom:35%; font-size:30px; line-height:1; }
-    /* Binolar va drakon umumiy uslubi */
-    .obyekt {
-      position:absolute; text-align:center; cursor:pointer;
-      transition:transform .1s;
-    }
-    .obyekt:active { transform:scale(.9); }
-    .obyekt .ikon { font-size:46px; filter:drop-shadow(0 4px 3px rgba(0,0,0,.4)); }
-    .obyekt .nom  { font-size:11px; background:rgba(0,0,0,.5); border-radius:8px; padding:1px 6px; display:inline-block; margin-top:2px; }
+    /* ===== Sahna (o'yin ko'rinadigan joy) ===== */
+    .sahna{flex:1;position:relative;overflow:hidden;background:#0b0f1a;}
+    .sahna svg{width:100%;height:100%;display:block;}
+    /* SVG ichidagi bosiladigan binolar */
+    .bino{cursor:pointer;transition:transform .12s;transform-origin:center bottom;}
+    .bino:active{transform:scale(.94);}
 
-    /* Drakon kasal bo'lganda xira ko'rinadi */
-    .kasal .ikon { filter:grayscale(1) brightness(.7); }
+    /* Drakon kasal bo'lganda xira */
+    #drakonArt.kasal{filter:grayscale(.85) brightness(.65);}
 
-    /* --- Pastdagi boshqaruv tugmalari --- */
-    .boshqaruv {
-      background:#0f1420; padding:10px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
-      max-height:42vh; overflow-y:auto;
-    }
-    button.t {
-      background:#3a4a6b; color:#fff; border:none; border-radius:12px;
-      padding:12px 14px; font-size:14px; font-weight:bold; cursor:pointer;
-      box-shadow:0 4px 0 #26304a; min-width:140px;
-    }
-    button.t:active { transform:translateY(3px); box-shadow:0 1px 0 #26304a; }
-    button.t:disabled { background:#555; box-shadow:0 4px 0 #333; color:#aaa; }
-    button.muhim { background:#c0392b; box-shadow:0 4px 0 #7d2419; }
-    button.yashil { background:#2e7d32; box-shadow:0 4px 0 #1b4d1f; }
+    /* Suzib chiqadigan xabar */
+    .xabar{position:absolute;left:50%;top:12px;transform:translateX(-50%) translateY(-10px);
+      background:rgba(8,12,22,.92);border:1px solid rgba(255,211,74,.4);
+      padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;text-align:center;
+      max-width:92%;opacity:0;transition:.35s;pointer-events:none;z-index:6;
+      box-shadow:0 6px 20px rgba(0,0,0,.5);}
+    .xabar.kor{opacity:1;transform:translateX(-50%) translateY(0);}
 
-    /* --- Xabar oynasi (pastda chiqadigan bildirishnoma) --- */
-    .xabar {
-      position:absolute; left:50%; top:14px; transform:translateX(-50%);
-      background:rgba(0,0,0,.8); padding:10px 18px; border-radius:12px;
-      font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; max-width:90%; text-align:center;
-    }
-    .xabar.kor { opacity:1; }
+    /* ===== Pastki tugmalar ===== */
+    .panel{background:rgba(10,14,26,.95);padding:10px;display:grid;
+      grid-template-columns:1fr 1fr;gap:8px;max-height:40vh;overflow-y:auto;
+      box-shadow:0 -4px 20px rgba(0,0,0,.6);}
+    .btn{display:flex;flex-direction:column;align-items:center;gap:2px;
+      border:none;border-radius:14px;padding:10px 8px;font-size:13px;font-weight:700;color:#fff;
+      cursor:pointer;background:linear-gradient(180deg,#3b4d79,#2a3656);
+      box-shadow:0 4px 0 #1c2440,inset 0 1px 0 rgba(255,255,255,.12);}
+    .btn small{font-size:11px;font-weight:500;opacity:.85;}
+    .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1c2440;}
+    .btn:disabled{filter:grayscale(.7) brightness(.7);box-shadow:0 4px 0 #1a1a1a;}
+    .btn.green{background:linear-gradient(180deg,#3ec46d,#249a4e);box-shadow:0 4px 0 #166634;}
+    .btn.gold{background:linear-gradient(180deg,#ffc94a,#e0a020);color:#3a2600;box-shadow:0 4px 0 #a86f00;}
+    .btn.red{grid-column:span 2;background:linear-gradient(180deg,#ff5b5b,#c0392b);box-shadow:0 4px 0 #7d1f15;}
   </style>
 </head>
-
 <body>
 
-  <!-- ===================== HTML = O'YIN SUYAGI ===================== -->
-
-  <!-- Yuqoridagi resurslar -->
-  <div class="resurslar">
-    <div class="resurs yogoch">🪵 Yog'och<b id="yogochYoz">0</b></div>
-    <div class="resurs gosht">🍖 Go'sht<b id="goshtYoz">0</b></div>
-    <div class="resurs pul">🪙 Pul<b id="pulYoz">0</b></div>
+  <!-- ===== HUD ===== -->
+  <div class="hud">
+    <div class="chip yog"><span class="ico">🪵</span><span class="val"><small>Yog'och</small><b id="yogochYoz">0</b></span></div>
+    <div class="chip gos"><span class="ico">🍖</span><span class="val"><small>Go'sht</small><b id="goshtYoz">0</b></span></div>
+    <div class="chip pul"><span class="ico">💰</span><span class="val"><small>Pul</small><b id="pulYoz">0</b></span></div>
   </div>
 
-  <!-- Baza maydoni -->
-  <div class="baza" id="baza">
+  <!-- ===== SAHNA (hammasi SVG bilan chizilgan) ===== -->
+  <div class="sahna">
     <div class="xabar" id="xabar"></div>
 
-    <!-- O'rmon (chap tomonda) -->
-    <div class="ormon">🌲🌲<br>🌲🌲</div>
+    <svg viewBox="0 0 400 470" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="osmon" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1e3a5f"/><stop offset=".5" stop-color="#3d6fa5"/>
+          <stop offset=".8" stop-color="#7eb6d9"/><stop offset="1" stop-color="#f3c98b"/>
+        </linearGradient>
+        <linearGradient id="yer" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#6fae3e"/><stop offset="1" stop-color="#3c6b22"/>
+        </linearGradient>
+        <linearGradient id="tosh" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#b8c0cc"/><stop offset="1" stop-color="#7d8593"/>
+        </linearGradient>
+        <linearGradient id="toshTomon" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#9aa3b2"/><stop offset="1" stop-color="#6a7280"/>
+        </linearGradient>
+        <linearGradient id="drBody" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ff7a3d"/><stop offset="1" stop-color="#c8341a"/>
+        </linearGradient>
+        <linearGradient id="drQanot" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e0522a"/><stop offset="1" stop-color="#8e2412"/>
+        </linearGradient>
+        <radialGradient id="quyosh" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#fff6c8"/><stop offset="1" stop-color="#ffd34a" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="soya" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".35"/>
+        </filter>
+      </defs>
 
-    <!-- Asosiy uy -->
-    <div class="obyekt" style="left:42%; top:45%;">
-      <div class="ikon">🏛️</div>
-      <div class="nom">Uy <span id="uyLvlYoz">1</span>-dr</div>
-    </div>
+      <!-- OSMON -->
+      <rect x="0" y="0" width="400" height="320" fill="url(#osmon)"/>
+      <circle cx="320" cy="80" r="60" fill="url(#quyosh)"/>
+      <circle cx="320" cy="80" r="26" fill="#fff6c8"/>
+      <!-- bulutlar -->
+      <g fill="#ffffff" opacity=".85">
+        <ellipse cx="90" cy="70" rx="38" ry="16"/><ellipse cx="120" cy="62" rx="28" ry="14"/>
+        <ellipse cx="250" cy="45" rx="30" ry="12"/><ellipse cx="225" cy="50" rx="20" ry="10"/>
+      </g>
+      <!-- uzoq tepaliklar -->
+      <ellipse cx="80" cy="330" rx="160" ry="70" fill="#3f7a4a" opacity=".7"/>
+      <ellipse cx="340" cy="335" rx="150" ry="65" fill="#356b40" opacity=".7"/>
 
-    <!-- Muzlatgich (go'sht ombori) -->
-    <div class="obyekt" style="left:70%; top:55%;">
-      <div class="ikon">🧊</div>
-      <div class="nom">Muzlatgich <span id="muzLvlYoz">1</span></div>
-    </div>
+      <!-- YER -->
+      <rect x="0" y="300" width="400" height="170" fill="url(#yer)"/>
+      <!-- yo'l -->
+      <path d="M150 470 Q200 390 200 330 Q200 390 250 470 Z" fill="#caa56b" opacity=".55"/>
 
-    <!-- Devor -->
-    <div class="obyekt" style="left:20%; top:60%;">
-      <div class="ikon">🧱</div>
-      <div class="nom">Devor <span id="devorLvlYoz">1</span></div>
-    </div>
+      <!-- O'RMON (chap) -->
+      <g filter="url(#soya)">
+        <g transform="translate(8,250)">
+          <rect x="20" y="48" width="9" height="30" fill="#5d4037"/><polygon points="24,4 0,54 49,54" fill="#2e7d32"/><polygon points="24,18 6,58 42,58" fill="#3a9540"/>
+          <rect x="52" y="60" width="8" height="26" fill="#5d4037"/><polygon points="56,24 36,66 76,66" fill="#256e2a"/>
+          <rect x="2" y="78" width="8" height="24" fill="#5d4037"/><polygon points="6,44 -12,86 24,86" fill="#327a36"/>
+        </g>
+      </g>
+      <text x="40" y="372" fill="#fff" font-size="12" font-weight="700" text-anchor="middle" filter="url(#soya)">O'rmon</text>
 
-    <!-- Drakon (holatiga qarab o'zgaradi) -->
-    <div class="obyekt" id="drakonObyekt" style="left:48%; top:68%;">
-      <div class="ikon" id="drakonIkon">➕</div>
-      <div class="nom" id="drakonNom">Drakon yo'q</div>
-    </div>
+      <!-- ===== QASR (asosiy uy) ===== -->
+      <g class="bino" id="qasrBino" filter="url(#soya)">
+        <!-- chap minora -->
+        <rect x="118" y="150" width="34" height="115" fill="url(#tosh)"/>
+        <rect x="116" y="142" width="38" height="12" fill="url(#toshTomon)"/>
+        <rect x="116" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="132" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="148" y="138" width="6" height="8" fill="#9aa3b2"/>
+        <!-- o'ng minora -->
+        <rect x="248" y="150" width="34" height="115" fill="url(#tosh)"/>
+        <rect x="246" y="142" width="38" height="12" fill="url(#toshTomon)"/>
+        <rect x="246" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="262" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="278" y="138" width="6" height="8" fill="#9aa3b2"/>
+        <!-- markaziy bino -->
+        <rect x="150" y="175" width="100" height="90" fill="url(#tosh)"/>
+        <rect x="148" y="168" width="104" height="10" fill="url(#toshTomon)"/>
+        <!-- katta tom (uchburchak) -->
+        <polygon points="135,150 200,100 265,150" fill="#b5532e"/>
+        <polygon points="135,150 200,100 200,150" fill="#9a4226"/>
+        <!-- bayroq -->
+        <line x1="200" y1="100" x2="200" y2="72" stroke="#5d4037" stroke-width="3"/>
+        <polygon points="200,74 226,82 200,90" fill="#ffce54"/>
+        <!-- darvoza -->
+        <path d="M180 265 V215 a20 20 0 0 1 40 0 V265 Z" fill="#5d4037"/>
+        <path d="M186 265 V216 a14 14 0 0 1 28 0 V265 Z" fill="#7a5640"/>
+        <line x1="200" y1="202" x2="200" y2="265" stroke="#4a3528" stroke-width="2"/>
+        <!-- derazalar -->
+        <rect x="128" y="175" width="14" height="22" rx="7" fill="#2a3a55"/>
+        <rect x="258" y="175" width="14" height="22" rx="7" fill="#2a3a55"/>
+        <!-- daraja yorlig'i -->
+        <rect x="172" y="120" width="56" height="20" rx="10" fill="#0b0f1a" opacity=".75"/>
+        <text x="200" y="134" fill="#ffce54" font-size="12" font-weight="800" text-anchor="middle">QASR <tspan id="uyLvlYoz">1</tspan>-dr</text>
+      </g>
+
+      <!-- ===== DEVOR (chap) ===== -->
+      <g class="bino" id="devorBino" filter="url(#soya)">
+        <rect x="30" y="318" width="90" height="40" fill="url(#tosh)"/>
+        <!-- tishlar -->
+        <rect x="30" y="310" width="14" height="10" fill="#9aa3b2"/><rect x="56" y="310" width="14" height="10" fill="#9aa3b2"/>
+        <rect x="82" y="310" width="14" height="10" fill="#9aa3b2"/><rect x="106" y="310" width="14" height="10" fill="#9aa3b2"/>
+        <!-- g'isht chiziqlari -->
+        <line x1="30" y1="335" x2="120" y2="335" stroke="#6a7280" stroke-width="1.5"/>
+        <line x1="60" y1="318" x2="60" y2="335" stroke="#6a7280" stroke-width="1.5"/>
+        <line x1="90" y1="335" x2="90" y2="358" stroke="#6a7280" stroke-width="1.5"/>
+        <text x="75" y="350" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">Devor <tspan id="devorLvlYoz">1</tspan></text>
+      </g>
+
+      <!-- ===== GO'SHT OMBORI (sovuq ombor - boshqacha) ===== -->
+      <g class="bino" id="muzBino" filter="url(#soya)">
+        <!-- tana -->
+        <rect x="300" y="270" width="74" height="78" rx="6" fill="#5a6b7d"/>
+        <rect x="300" y="270" width="74" height="78" rx="6" fill="url(#toshTomon)" opacity=".4"/>
+        <!-- muz tomi -->
+        <polygon points="294,272 337,238 380,272" fill="#dff1fb"/>
+        <polygon points="294,272 337,238 337,272" fill="#bfe2f4"/>
+        <!-- muz tomchilari -->
+        <path d="M300 272 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0" fill="#dff1fb"/>
+        <!-- eshik -->
+        <rect x="320" y="298" width="34" height="50" rx="4" fill="#3a4a5c"/>
+        <circle cx="348" cy="324" r="3" fill="#cdd8e4"/>
+        <!-- go'sht belgisi -->
+        <text x="337" y="294" font-size="18" text-anchor="middle">🍖</text>
+        <rect x="306" y="252" width="62" height="18" rx="9" fill="#0b0f1a" opacity=".75"/>
+        <text x="337" y="265" fill="#9fe0ff" font-size="10.5" font-weight="800" text-anchor="middle">OMBOR <tspan id="muzLvlYoz">1</tspan></text>
+      </g>
+
+      <!-- ===== DRAKON (JS bu yerga chizadi) ===== -->
+      <g id="drakonArt" transform="translate(5,298)"></g>
+      <g class="bino" id="drakonObyekt" transform="translate(200,432)">
+        <rect x="-62" y="-14" width="124" height="22" rx="11" fill="#0b0f1a" opacity=".8"/>
+        <text id="drakonNom" x="0" y="2" fill="#ffce54" font-size="12" font-weight="800" text-anchor="middle">Drakon yo'q</text>
+      </g>
+    </svg>
   </div>
 
-  <!-- Pastdagi boshqaruv tugmalari -->
-  <div class="boshqaruv">
-    <button class="t yashil" id="tuxumTugma">🥚 Tuxum sotib olish (100🪙)</button>
-    <button class="t" id="boqishTugma">🍖 Drakonni boqish (50🍖)</button>
-    <button class="t" id="uyTugma">🏛️ Uyni yaxshilash</button>
-    <button class="t" id="ormonTugma">🌲 O'rmon (yog'och yig'ish)</button>
-    <button class="t" id="muzTugma">🧊 Muzlatgich yaxshilash</button>
-    <button class="t" id="devorTugma">🧱 Devorni yaxshilash</button>
-    <button class="t muhim" id="hujumTugma">⚔️ Dushman hujumini sinash</button>
+  <!-- ===== TUGMALAR ===== -->
+  <div class="panel">
+    <button class="btn green" id="tuxumTugma">🥚 Tuxum olish<small>100 💰</small></button>
+    <button class="btn gold" id="boqishTugma">🍖 Drakonni boqish<small>50 🍖</small></button>
+    <button class="btn" id="uyTugma">🏰 Qasrni yaxshilash<small id="uyNarxYoz"></small></button>
+    <button class="btn" id="ormonTugma">🌲 O'rmon<small id="ormonNarxYoz"></small></button>
+    <button class="btn" id="muzTugma">❄️ Omborni yaxshilash<small id="muzNarxYoz"></small></button>
+    <button class="btn" id="devorTugma">🧱 Devorni yaxshilash<small id="devorNarxYoz"></small></button>
+    <button class="btn red" id="hujumTugma">⚔️ Dushman hujumini sinash</button>
   </div>
 
-
-  <!-- ===================== JavaScript = O'YIN MIYASI ===================== -->
+  <!-- ===================== O'YIN MIYASI ===================== -->
   <script>
-  /* ----------------------------------------------------------------
-     1) O'YIN XOTIRASI - barcha sonlar shu yerda saqlanadi
-     ---------------------------------------------------------------- */
+  /* 1) XOTIRA */
   let oyin = {
-    yogoch: 50,
-    gosht: 50,
-    pul: 150,
-
-    uyLvl: 1,
-    ormonLvl: 1,
-    muzLvl: 1,
-    devorLvl: 1,
-
-    // Drakon holati:
-    // "yoq"=hali yo'q, "tuxum"=tuxumda, "tirik"=jangga tayyor, "kasal"=davolanyapti
-    drakonHolat: "yoq",
-    drakonLvl: 0,
-    tuxumOchilishVaqti: 0,   // tuxum qachon ochilishi (vaqt belgisi)
-    kasalTugashVaqti: 0      // kasallik qachon tugashi (vaqt belgisi)
+    yogoch:50, gosht:50, pul:150,
+    uyLvl:1, ormonLvl:1, muzLvl:1, devorLvl:1,
+    drakonHolat:"yoq", drakonLvl:0, tuxumOchilishVaqti:0, kasalTugashVaqti:0
   };
+  const E=(id)=>document.getElementById(id);
 
-  /* ----------------------------------------------------------------
-     2) EKRANDAGI ELEMENTLARNI USHLAB OLAMIZ
-     ---------------------------------------------------------------- */
-  const E = (id) => document.getElementById(id);  // qisqa yordamchi
+  /* 2) XABAR */
+  let xt;
+  function xabar(m){const x=E("xabar");x.textContent=m;x.classList.add("kor");
+    clearTimeout(xt);xt=setTimeout(()=>x.classList.remove("kor"),2400);}
 
-  /* ----------------------------------------------------------------
-     3) XABAR KO'RSATISH (ekran tepasida chiqadigan bildirishnoma)
-     ---------------------------------------------------------------- */
-  let xabarVaqt;
-  function xabar(matn) {
-    const x = E("xabar");
-    x.textContent = matn;
-    x.classList.add("kor");
-    clearTimeout(xabarVaqt);
-    xabarVaqt = setTimeout(() => x.classList.remove("kor"), 2200);
+  /* 3) NARXLAR */
+  const uyNarx=()=>oyin.uyLvl*100, ormonNarx=()=>oyin.ormonLvl*40,
+        muzNarx=()=>oyin.muzLvl*60, devorNarx=()=>oyin.devorLvl*50,
+        goshtSigim=()=>oyin.muzLvl*100;
+  const drakonKuchi=()=>oyin.drakonHolat==="tirik"?oyin.drakonLvl*20:0;
+  const devorKuchi=()=>oyin.devorLvl*15;
+
+  /* 4) DRAKON RASMLARI (SVG) - holatga qarab almashadi */
+  function tuxumSvg(){return `
+    <g transform="translate(178,92)">
+      <ellipse cx="0" cy="42" rx="34" ry="9" fill="#000" opacity=".25"/>
+      <ellipse cx="0" cy="0" rx="26" ry="34" fill="#f3e3bf" stroke="#cbb98a" stroke-width="2"/>
+      <circle cx="-9" cy="-12" r="4" fill="#d8c79a"/><circle cx="10" cy="2" r="5" fill="#d8c79a"/><circle cx="-4" cy="14" r="3" fill="#d8c79a"/>
+      <path d="M-10 -20 l6 8 l-5 6 l8 4" fill="none" stroke="#b09a63" stroke-width="1.5"/>
+    </g>`;}
+  function bolaSvg(){return `
+    <g transform="translate(150,70)">
+      <ellipse cx="50" cy="78" rx="40" ry="9" fill="#000" opacity=".25"/>
+      <ellipse cx="50" cy="55" rx="28" ry="24" fill="url(#drBody)"/>
+      <circle cx="50" cy="28" r="20" fill="url(#drBody)"/>
+      <polygon points="38,12 44,-2 50,12" fill="#8e2412"/><polygon points="62,12 56,-2 50,12" fill="#8e2412"/>
+      <circle cx="43" cy="26" r="4" fill="#fff"/><circle cx="44" cy="27" r="2" fill="#000"/>
+      <circle cx="57" cy="26" r="4" fill="#fff"/><circle cx="56" cy="27" r="2" fill="#000"/>
+      <ellipse cx="50" cy="38" rx="10" ry="6" fill="#ffb98a"/>
+      <path d="M24 50 q-18 -6 -14 14 q14 -4 16 2 Z" fill="url(#drQanot)"/>
+      <path d="M76 50 q18 -6 14 14 q-14 -4 -16 2 Z" fill="url(#drQanot)"/>
+    </g>`;}
+  function kattaSvg(){return `
+    <g transform="translate(110,30)">
+      <ellipse cx="90" cy="118" rx="70" ry="12" fill="#000" opacity=".3"/>
+      <!-- qanotlar -->
+      <path d="M70 60 C10 20 -10 50 6 96 C30 70 52 78 66 86 Z" fill="url(#drQanot)" stroke="#7a1e0f" stroke-width="2"/>
+      <path d="M110 60 C170 20 190 50 174 96 C150 70 128 78 114 86 Z" fill="url(#drQanot)" stroke="#7a1e0f" stroke-width="2"/>
+      <path d="M14 88 L6 96 M40 76 L36 92 M64 80 L62 94" stroke="#7a1e0f" stroke-width="1.5" fill="none"/>
+      <path d="M166 88 L174 96 M140 76 L144 92 M116 80 L118 94" stroke="#7a1e0f" stroke-width="1.5" fill="none"/>
+      <!-- dum -->
+      <path d="M90 110 q40 30 80 10 q-30 -6 -46 -28" fill="url(#drBody)"/>
+      <polygon points="168,118 184,112 172,126" fill="#8e2412"/>
+      <!-- oyoqlar -->
+      <ellipse cx="68" cy="118" rx="13" ry="10" fill="#a82c16"/>
+      <ellipse cx="112" cy="118" rx="13" ry="10" fill="#a82c16"/>
+      <path d="M58 124 l4 6 M68 126 l0 7 M78 124 l-3 6" stroke="#5a160a" stroke-width="2"/>
+      <path d="M102 124 l4 6 M112 126 l0 7 M122 124 l-3 6" stroke="#5a160a" stroke-width="2"/>
+      <!-- tana -->
+      <ellipse cx="90" cy="92" rx="42" ry="34" fill="url(#drBody)"/>
+      <path d="M62 92 q28 26 56 0 q-8 22 -28 24 q-20 -2 -28 -24" fill="#ffcaa0"/>
+      <!-- bo'yin va bosh -->
+      <path d="M78 64 C72 36 92 22 104 22 C120 22 120 44 108 58 Z" fill="url(#drBody)"/>
+      <ellipse cx="112" cy="34" rx="24" ry="20" fill="url(#drBody)"/>
+      <path d="M122 30 q22 -2 26 8 q-16 4 -24 -2 Z" fill="#c8341a"/>
+      <!-- shoxlar -->
+      <polygon points="100,16 96,-4 108,12" fill="#e9dcc0"/><polygon points="118,16 124,-4 128,14" fill="#e9dcc0"/>
+      <!-- ko'z -->
+      <ellipse cx="110" cy="30" rx="6" ry="7" fill="#fff"/><circle cx="111" cy="31" r="3" fill="#1a1a1a"/>
+      <!-- tishlar -->
+      <polygon points="132,40 136,48 128,46" fill="#fff"/><polygon points="124,42 127,50 119,47" fill="#fff"/>
+      <!-- belgisi (orqa tikon) -->
+      <path d="M70 64 l6 -10 l6 10 M82 60 l6 -12 l6 12 M94 60 l6 -10 l6 10" fill="#8e2412"/>
+    </g>`;}
+
+  /* 5) EKRANNI YANGILASH */
+  function yangila(){
+    E("yogochYoz").textContent=Math.floor(oyin.yogoch);
+    E("goshtYoz").textContent=Math.floor(oyin.gosht)+"/"+goshtSigim();
+    E("pulYoz").textContent=Math.floor(oyin.pul);
+    E("uyLvlYoz").textContent=oyin.uyLvl;
+    E("muzLvlYoz").textContent=oyin.muzLvl;
+    E("devorLvlYoz").textContent=oyin.devorLvl;
+    E("uyNarxYoz").textContent=uyNarx()+" 💰";
+    E("ormonNarxYoz").textContent=ormonNarx()+" 💰";
+    E("muzNarxYoz").textContent=muzNarx()+" 🪵";
+    E("devorNarxYoz").textContent=devorNarx()+" 🪵";
+
+    // DRAKON
+    const art=E("drakonArt"); art.classList.remove("kasal");
+    if(oyin.drakonHolat==="yoq"){art.innerHTML="";E("drakonNom").textContent="Drakon yo'q (tuxum oling)";}
+    else if(oyin.drakonHolat==="tuxum"){art.innerHTML=tuxumSvg();
+      const q=Math.ceil((oyin.tuxumOchilishVaqti-Date.now())/1000);
+      E("drakonNom").textContent="🥚 Ochilmoqda: "+q+"s";}
+    else if(oyin.drakonHolat==="tirik"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();
+      E("drakonNom").textContent="🐉 Drakon "+oyin.drakonLvl+"-dr · kuch "+drakonKuchi();}
+    else if(oyin.drakonHolat==="kasal"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();art.classList.add("kasal");
+      const q=Math.ceil((oyin.kasalTugashVaqti-Date.now())/1000);
+      E("drakonNom").textContent="🤒 Kasal: "+q+"s";}
+
+    E("tuxumTugma").disabled=(oyin.drakonHolat!=="yoq")||(oyin.pul<100);
+    E("boqishTugma").disabled=(oyin.drakonHolat!=="tirik")||(oyin.gosht<50);
+    E("uyTugma").disabled=oyin.pul<uyNarx();
+    E("ormonTugma").disabled=oyin.pul<ormonNarx();
+    E("muzTugma").disabled=oyin.yogoch<muzNarx();
+    E("devorTugma").disabled=oyin.yogoch<devorNarx();
   }
 
-  /* ----------------------------------------------------------------
-     4) NARXLARNI HISOBLASH (daraja oshgan sari qimmatlashadi)
-     ---------------------------------------------------------------- */
-  function uyNarx()    { return oyin.uyLvl * 100; }        // pul
-  function ormonNarx() { return oyin.ormonLvl * 40; }      // pul
-  function muzNarx()   { return oyin.muzLvl * 60; }        // yog'och
-  function devorNarx() { return oyin.devorLvl * 50; }      // yog'och
+  /* 6) TUGMALAR */
+  E("tuxumTugma").onclick=()=>{oyin.pul-=100;oyin.drakonHolat="tuxum";oyin.drakonLvl=1;
+    oyin.tuxumOchilishVaqti=Date.now()+30000;xabar("🥚 Tuxum olindi! 30s da ochiladi.");yangila();saqla();};
+  E("boqishTugma").onclick=()=>{oyin.gosht-=50;oyin.drakonLvl++;
+    xabar("🍖 Drakon o'sdi! "+oyin.drakonLvl+"-daraja.");yangila();saqla();};
+  E("uyTugma").onclick=()=>{oyin.pul-=uyNarx();oyin.uyLvl++;xabar("🏰 Qasr yaxshilandi!");yangila();saqla();};
+  E("ormonTugma").onclick=()=>{oyin.pul-=ormonNarx();oyin.ormonLvl++;xabar("🌲 O'rmon yaxshilandi!");yangila();saqla();};
+  E("muzTugma").onclick=()=>{oyin.yogoch-=muzNarx();oyin.muzLvl++;xabar("❄️ Ombor kengaydi!");yangila();saqla();};
+  E("devorTugma").onclick=()=>{oyin.yogoch-=devorNarx();oyin.devorLvl++;xabar("🧱 Devor mustahkamlandi!");yangila();saqla();};
+  E("hujumTugma").onclick=()=>dushmanHujumi();
 
-  // Go'sht ombori sig'imi (muzlatgich darajasiga bog'liq)
-  function goshtSigim() { return oyin.muzLvl * 100; }
+  // qasrni bossa ham yaxshilanadi (qulaylik uchun)
+  E("qasrBino").onclick=()=>{if(!E("uyTugma").disabled)E("uyTugma").onclick();};
+  E("devorBino").onclick=()=>{if(!E("devorTugma").disabled)E("devorTugma").onclick();};
+  E("muzBino").onclick=()=>{if(!E("muzTugma").disabled)E("muzTugma").onclick();};
 
-  /* ----------------------------------------------------------------
-     5) EKRANNI YANGILASH - sonlarni va tugmalarni qayta chizamiz
-     ---------------------------------------------------------------- */
-  function yangila() {
-    // Resurslar
-    E("yogochYoz").textContent = Math.floor(oyin.yogoch);
-    E("goshtYoz").textContent  = Math.floor(oyin.gosht) + " / " + goshtSigim();
-    E("pulYoz").textContent    = Math.floor(oyin.pul);
-
-    // Binolar darajasi
-    E("uyLvlYoz").textContent    = oyin.uyLvl;
-    E("muzLvlYoz").textContent   = oyin.muzLvl;
-    E("devorLvlYoz").textContent = oyin.devorLvl;
-
-    // Tugma yozuvlari (narx bilan)
-    E("uyTugma").textContent    = "🏛️ Uyni yaxshilash (" + uyNarx() + "🪙)";
-    E("ormonTugma").textContent = "🌲 O'rmon yaxshilash (" + ormonNarx() + "🪙)";
-    E("muzTugma").textContent   = "🧊 Muzlatgich yaxshilash (" + muzNarx() + "🪵)";
-    E("devorTugma").textContent = "🧱 Devorni yaxshilash (" + devorNarx() + "🪵)";
-
-    // --- DRAKON ko'rinishi holatiga qarab ---
-    const ob = E("drakonObyekt");
-    ob.classList.remove("kasal");
-    if (oyin.drakonHolat === "yoq") {
-      E("drakonIkon").textContent = "➕";
-      E("drakonNom").textContent = "Drakon yo'q";
-    } else if (oyin.drakonHolat === "tuxum") {
-      const qoldi = Math.ceil((oyin.tuxumOchilishVaqti - Date.now()) / 1000);
-      E("drakonIkon").textContent = "🥚";
-      E("drakonNom").textContent = "Ochilmoqda: " + qoldi + "s";
-    } else if (oyin.drakonHolat === "tirik") {
-      // Daraja oshgan sari drakon kattaroq ko'rinadi
-      E("drakonIkon").textContent = oyin.drakonLvl < 3 ? "🐣" : "🐉";
-      E("drakonNom").textContent = "Drakon " + oyin.drakonLvl + "-dr (kuch:" + drakonKuchi() + ")";
-    } else if (oyin.drakonHolat === "kasal") {
-      const qoldi = Math.ceil((oyin.kasalTugashVaqti - Date.now()) / 1000);
-      ob.classList.add("kasal");
-      E("drakonIkon").textContent = "🤒";
-      E("drakonNom").textContent = "Kasal: " + qoldi + "s";
-    }
-
-    // Tugmalarni yoqish/o'chirish (yetarli resurs bo'lsa yoqamiz)
-    E("tuxumTugma").disabled  = (oyin.drakonHolat !== "yoq") || (oyin.pul < 100);
-    E("boqishTugma").disabled = (oyin.drakonHolat !== "tirik") || (oyin.gosht < 50);
-    E("uyTugma").disabled     = (oyin.pul < uyNarx());
-    E("ormonTugma").disabled  = (oyin.pul < ormonNarx());
-    E("muzTugma").disabled    = (oyin.yogoch < muzNarx());
-    E("devorTugma").disabled  = (oyin.yogoch < devorNarx());
-  }
-
-  /* ----------------------------------------------------------------
-     6) DRAKON KUCHI - daraja qancha katta bo'lsa, shuncha kuchli
-     ---------------------------------------------------------------- */
-  function drakonKuchi() {
-    if (oyin.drakonHolat !== "tirik") return 0;  // kasal yoki yo'q bo'lsa kuchi 0
-    return oyin.drakonLvl * 20;
-  }
-  // Devor ham himoyaga kuch qo'shadi
-  function devorKuchi() { return oyin.devorLvl * 15; }
-
-  /* ----------------------------------------------------------------
-     7) TUGMALAR BOSILGANDA NIMA BO'LISHI
-     ---------------------------------------------------------------- */
-
-  // Tuxum sotib olish
-  E("tuxumTugma").onclick = () => {
-    oyin.pul -= 100;
-    oyin.drakonHolat = "tuxum";
-    oyin.drakonLvl = 1;
-    oyin.tuxumOchilishVaqti = Date.now() + 30000; // 30 soniyada ochiladi
-    xabar("🥚 Tuxum sotib olindi! 30 soniyada ochiladi.");
-    yangila(); saqla();
-  };
-
-  // Drakonni boqish (go'sht beramiz -> daraja oshadi)
-  E("boqishTugma").onclick = () => {
-    oyin.gosht -= 50;
-    oyin.drakonLvl += 1;
-    xabar("🍖 Drakon o'sdi! Endi " + oyin.drakonLvl + "-daraja.");
-    yangila(); saqla();
-  };
-
-  // Binolarni yaxshilash
-  E("uyTugma").onclick = () => {
-    oyin.pul -= uyNarx(); oyin.uyLvl += 1;
-    xabar("🏛️ Asosiy uy yaxshilandi!"); yangila(); saqla();
-  };
-  E("ormonTugma").onclick = () => {
-    oyin.pul -= ormonNarx(); oyin.ormonLvl += 1;
-    xabar("🌲 O'rmon yaxshilandi! Ko'proq yog'och keladi."); yangila(); saqla();
-  };
-  E("muzTugma").onclick = () => {
-    oyin.yogoch -= muzNarx(); oyin.muzLvl += 1;
-    xabar("🧊 Muzlatgich yaxshilandi! Ko'proq go'sht sig'adi."); yangila(); saqla();
-  };
-  E("devorTugma").onclick = () => {
-    oyin.yogoch -= devorNarx(); oyin.devorLvl += 1;
-    xabar("🧱 Devor mustahkamlandi!"); yangila(); saqla();
-  };
-
-  /* ----------------------------------------------------------------
-     8) DUSHMAN HUJUMI - eng muhim qism (himoya + drakon kasalligi)
-     ---------------------------------------------------------------- */
-  E("hujumTugma").onclick = () => dushmanHujumi();
-
-  function dushmanHujumi() {
-    // Dushman kuchi - uy darajasiga qarab kuchayadi (tasodifiy)
-    const dushmanKuchi = 30 + Math.floor(Math.random() * (oyin.uyLvl * 40));
-
-    // Bizning himoyamiz = drakon kuchi + devor kuchi
-    const himoya = drakonKuchi() + devorKuchi();
-
-    xabar("⚔️ Dushman keldi! Kuchi: " + dushmanKuchi + " | Himoya: " + himoya);
-
-    setTimeout(() => {
-      if (himoya >= dushmanKuchi) {
-        // ----- G'ALABA -----
-        const mukofot = 30 + Math.floor(Math.random() * 50);
-        oyin.pul += mukofot;
-        xabar("🛡️ G'ALABA! Dushman qaytarildi. +" + mukofot + "🪙");
-      } else {
-        // ----- MAG'LUBIYAT -----
-        // Dushman go'shtni o'g'irlaydi
-        const ogirlangan = Math.floor(oyin.gosht * 0.5);
-        oyin.gosht -= ogirlangan;
-
-        // Agar drakon jangda qatnashgan bo'lsa, kasal bo'ladi.
-        // Kasallik vaqti = daraja qancha katta bo'lsa, shuncha uzoq!
-        if (oyin.drakonHolat === "tirik") {
-          const kasalSoniya = oyin.drakonLvl * 15; // har daraja = +15 soniya
-          oyin.drakonHolat = "kasal";
-          oyin.kasalTugashVaqti = Date.now() + kasalSoniya * 1000;
-          xabar("💔 MAG'LUBIYAT! " + ogirlangan + "🍖 o'g'irlandi. Drakon " + kasalSoniya + "s kasal bo'ldi!");
-        } else {
-          xabar("💔 MAG'LUBIYAT! Dushman " + ogirlangan + "🍖 go'sht o'g'irladi!");
-        }
+  /* 7) DUSHMAN HUJUMI */
+  function dushmanHujumi(){
+    const dushman=30+Math.floor(Math.random()*(oyin.uyLvl*40));
+    const himoya=drakonKuchi()+devorKuchi();
+    xabar("⚔️ Dushman keldi! Kuch "+dushman+" | Himoya "+himoya);
+    setTimeout(()=>{
+      if(himoya>=dushman){
+        const m=30+Math.floor(Math.random()*50);oyin.pul+=m;
+        xabar("🛡️ G'ALABA! Dushman qaytdi. +"+m+" 💰");
+      }else{
+        const o=Math.floor(oyin.gosht*0.5);oyin.gosht-=o;
+        if(oyin.drakonHolat==="tirik"){
+          const s=oyin.drakonLvl*15;oyin.drakonHolat="kasal";oyin.kasalTugashVaqti=Date.now()+s*1000;
+          xabar("💔 MAG'LUBIYAT! "+o+"🍖 o'g'irlandi. Drakon "+s+"s kasal!");
+        }else xabar("💔 MAG'LUBIYAT! Dushman "+o+"🍖 o'g'irladi!");
       }
-      yangila(); saqla();
-    }, 700);
+      yangila();saqla();
+    },700);
   }
 
-  /* ----------------------------------------------------------------
-     9) VAQT G'ILDIRAGI - har soniyada ishlaydigan buyruqlar
-        (resurs ishlab chiqarish, tuxum ochilishi, kasallikdan tuzalish)
-     ---------------------------------------------------------------- */
-  setInterval(() => {
-    // O'rmon ishchilari yog'och yig'adi (daraja = tezlik)
-    oyin.yogoch += oyin.ormonLvl;
-
-    // Muzlatgich go'sht ishlab chiqaradi (sig'imdan oshmaydi)
-    if (oyin.gosht < goshtSigim()) {
-      oyin.gosht += oyin.muzLvl;
-      if (oyin.gosht > goshtSigim()) oyin.gosht = goshtSigim();
-    }
-
-    // Tuxum vaqti kelganda ochiladi
-    if (oyin.drakonHolat === "tuxum" && Date.now() >= oyin.tuxumOchilishVaqti) {
-      oyin.drakonHolat = "tirik";
-      xabar("🎉 Tuxum ochildi! Drakon dunyoga keldi!");
-    }
-
-    // Kasallik vaqti tugaganda drakon tuzaladi
-    if (oyin.drakonHolat === "kasal" && Date.now() >= oyin.kasalTugashVaqti) {
-      oyin.drakonHolat = "tirik";
-      xabar("💚 Drakon sog'aydi! Yana jangga tayyor.");
-    }
-
+  /* 8) VAQT G'ILDIRAGI */
+  setInterval(()=>{
+    oyin.yogoch+=oyin.ormonLvl;
+    if(oyin.gosht<goshtSigim()){oyin.gosht+=oyin.muzLvl;if(oyin.gosht>goshtSigim())oyin.gosht=goshtSigim();}
+    if(oyin.drakonHolat==="tuxum"&&Date.now()>=oyin.tuxumOchilishVaqti){oyin.drakonHolat="tirik";xabar("🎉 Tuxum ochildi! Drakon tug'ildi!");}
+    if(oyin.drakonHolat==="kasal"&&Date.now()>=oyin.kasalTugashVaqti){oyin.drakonHolat="tirik";xabar("💚 Drakon sog'aydi!");}
     yangila();
-  }, 1000); // 1000 millisoniya = 1 soniya
+  },1000);
 
-  /* ----------------------------------------------------------------
-     10) SAQLASH va YUKLASH (brauzer yopilsa ham unutmaydi)
-     ---------------------------------------------------------------- */
-  function saqla() {
-    localStorage.setItem("drakonBazasi", JSON.stringify(oyin));
-  }
-  function yukla() {
-    const saqlangan = localStorage.getItem("drakonBazasi");
-    if (saqlangan) {
-      oyin = JSON.parse(saqlangan);
-    }
-  }
+  /* 9) SAQLASH/YUKLASH */
+  function saqla(){localStorage.setItem("drakonQasri",JSON.stringify(oyin));}
+  function yukla(){const s=localStorage.getItem("drakonQasri");if(s)oyin=JSON.parse(s);}
 
-  /* ----------------------------------------------------------------
-     11) O'YINNI BOSHLASH
-     ---------------------------------------------------------------- */
-  yukla();
-  yangila();
+  yukla();yangila();
   </script>
 </body>
 </html>
