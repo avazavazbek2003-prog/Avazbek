@@ -1,90 +1,78 @@
 <!DOCTYPE html>
-<!-- ============================================================
-     OLTIN KONI - 1-o'yin
-     Bu fayl butun o'yin. Telefonda Chrome'da ochib o'ynang.
-     Pastdagi har bir qism o'zbek tilida izohlangan.
-     ============================================================ -->
+<!-- ================================================================
+     DRAKON BAZASI  -  1-versiya
+     Telefonda o'ynaladigan baza qurish o'yini.
+     Bu fayl butun o'yin. Brauzerda (Chrome) ochib o'ynang.
+     Har bir qism o'zbek tilida izohlangan.
+     ================================================================ -->
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <!-- Pastdagi qator o'yinni TELEFON ekraniga moslaydi -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Oltin Koni</title>
+  <title>Drakon Bazasi</title>
 
   <!-- ===================== CSS = O'YIN KIYIMI ===================== -->
   <style>
-    /* Butun sahifaning umumiy ko'rinishi */
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:Arial, sans-serif; }
     body {
-      font-family: Arial, sans-serif;
-      /* Orqa fon - osmon va o'tloq rangi */
-      background: linear-gradient(#4ec0e9 0%, #4ec0e9 55%, #6abe30 55%, #4a8c20 100%);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
-      overflow: hidden;
+      background:#1d2330; color:#fff; height:100vh; overflow:hidden;
+      display:flex; flex-direction:column; user-select:none;
     }
 
-    /* Yuqoridagi hisob paneli (oltin va daraja) */
-    .panel {
-      margin-top: 30px;
-      background: rgba(0,0,0,0.45);
-      color: #fff;
-      padding: 14px 26px;
-      border-radius: 18px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    /* --- Yuqoridagi resurs paneli --- */
+    .resurslar {
+      display:flex; justify-content:space-around; gap:6px;
+      background:#0f1420; padding:10px 6px; box-shadow:0 2px 8px rgba(0,0,0,.5);
     }
-    .panel .oltin { font-size: 34px; font-weight: bold; color: #ffd54a; }
-    .panel .daraja { font-size: 16px; margin-top: 4px; opacity: 0.9; }
+    .resurs { text-align:center; font-size:14px; }
+    .resurs b { display:block; font-size:18px; }
+    .yogoch b { color:#9ccc65; }
+    .gosht  b { color:#ff8a65; }
+    .pul    b { color:#ffd54a; }
 
-    /* Oltin koni tugmasi (bosiladigan asosiy narsa) */
-    .kon {
-      margin-top: 60px;
-      font-size: 120px;
-      cursor: pointer;
-      transition: transform 0.08s;
-      filter: drop-shadow(0 8px 6px rgba(0,0,0,0.35));
+    /* --- Baza maydoni (o'yin ko'rinadigan joy) --- */
+    .baza {
+      flex:1; position:relative;
+      background:
+        linear-gradient(#5db6e6 0%, #5db6e6 40%, #79c34a 40%, #4e8c2a 100%);
+      overflow:hidden;
     }
-    /* Bosilganda biroz kichrayadi - "bosildi" hissi beradi */
-    .kon:active { transform: scale(0.88); }
+    /* O'rmon - chap tomonda daraxtlar */
+    .ormon { position:absolute; left:0; bottom:35%; font-size:30px; line-height:1; }
+    /* Binolar va drakon umumiy uslubi */
+    .obyekt {
+      position:absolute; text-align:center; cursor:pointer;
+      transition:transform .1s;
+    }
+    .obyekt:active { transform:scale(.9); }
+    .obyekt .ikon { font-size:46px; filter:drop-shadow(0 4px 3px rgba(0,0,0,.4)); }
+    .obyekt .nom  { font-size:11px; background:rgba(0,0,0,.5); border-radius:8px; padding:1px 6px; display:inline-block; margin-top:2px; }
 
-    .yozuv { color: #fff; margin-top: 18px; font-size: 17px; text-shadow: 0 2px 3px rgba(0,0,0,0.4); }
+    /* Drakon kasal bo'lganda xira ko'rinadi */
+    .kasal .ikon { filter:grayscale(1) brightness(.7); }
 
-    /* Yaxshilash tugmasi */
-    .upgrade {
-      margin-top: auto;
-      margin-bottom: 40px;
-      background: #ffb300;
-      border: none;
-      color: #4a2c00;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 16px 30px;
-      border-radius: 16px;
-      box-shadow: 0 5px 0 #c98a00;
-      cursor: pointer;
+    /* --- Pastdagi boshqaruv tugmalari --- */
+    .boshqaruv {
+      background:#0f1420; padding:10px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+      max-height:42vh; overflow-y:auto;
     }
-    .upgrade:active { transform: translateY(4px); box-shadow: 0 1px 0 #c98a00; }
-    .upgrade:disabled { background: #999; box-shadow: 0 5px 0 #666; color: #ddd; }
+    button.t {
+      background:#3a4a6b; color:#fff; border:none; border-radius:12px;
+      padding:12px 14px; font-size:14px; font-weight:bold; cursor:pointer;
+      box-shadow:0 4px 0 #26304a; min-width:140px;
+    }
+    button.t:active { transform:translateY(3px); box-shadow:0 1px 0 #26304a; }
+    button.t:disabled { background:#555; box-shadow:0 4px 0 #333; color:#aaa; }
+    button.muhim { background:#c0392b; box-shadow:0 4px 0 #7d2419; }
+    button.yashil { background:#2e7d32; box-shadow:0 4px 0 #1b4d1f; }
 
-    /* Bosilganda "+1" raqami uchib chiqishi (animatsiya) */
-    .uchadigan {
-      position: absolute;
-      color: #ffd54a;
-      font-size: 28px;
-      font-weight: bold;
-      pointer-events: none;
-      animation: uchish 0.8s ease-out forwards;
-      text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+    /* --- Xabar oynasi (pastda chiqadigan bildirishnoma) --- */
+    .xabar {
+      position:absolute; left:50%; top:14px; transform:translateX(-50%);
+      background:rgba(0,0,0,.8); padding:10px 18px; border-radius:12px;
+      font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; max-width:90%; text-align:center;
     }
-    @keyframes uchish {
-      0%   { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-80px); }
-    }
+    .xabar.kor { opacity:1; }
   </style>
 </head>
 
@@ -92,92 +80,296 @@
 
   <!-- ===================== HTML = O'YIN SUYAGI ===================== -->
 
-  <!-- Yuqoridagi panel: oltin miqdori va daraja -->
-  <div class="panel">
-    <div class="oltin"><span id="oltinSoni">0</span> 🪙</div>
-    <div class="daraja">Bir bosishda: <span id="kuch">1</span> oltin</div>
+  <!-- Yuqoridagi resurslar -->
+  <div class="resurslar">
+    <div class="resurs yogoch">🪵 Yog'och<b id="yogochYoz">0</b></div>
+    <div class="resurs gosht">🍖 Go'sht<b id="goshtYoz">0</b></div>
+    <div class="resurs pul">🪙 Pul<b id="pulYoz">0</b></div>
   </div>
 
-  <!-- Asosiy oltin koni - shuni bosamiz -->
-  <div class="kon" id="kon">⛏️</div>
-  <div class="yozuv">👆 Konni bosib oltin yig'!</div>
+  <!-- Baza maydoni -->
+  <div class="baza" id="baza">
+    <div class="xabar" id="xabar"></div>
 
-  <!-- Yaxshilash tugmasi -->
-  <button class="upgrade" id="upgradeTugma">
-    Yaxshilash (50 🪙) — har bosishga +1
-  </button>
+    <!-- O'rmon (chap tomonda) -->
+    <div class="ormon">🌲🌲<br>🌲🌲</div>
+
+    <!-- Asosiy uy -->
+    <div class="obyekt" style="left:42%; top:45%;">
+      <div class="ikon">🏛️</div>
+      <div class="nom">Uy <span id="uyLvlYoz">1</span>-dr</div>
+    </div>
+
+    <!-- Muzlatgich (go'sht ombori) -->
+    <div class="obyekt" style="left:70%; top:55%;">
+      <div class="ikon">🧊</div>
+      <div class="nom">Muzlatgich <span id="muzLvlYoz">1</span></div>
+    </div>
+
+    <!-- Devor -->
+    <div class="obyekt" style="left:20%; top:60%;">
+      <div class="ikon">🧱</div>
+      <div class="nom">Devor <span id="devorLvlYoz">1</span></div>
+    </div>
+
+    <!-- Drakon (holatiga qarab o'zgaradi) -->
+    <div class="obyekt" id="drakonObyekt" style="left:48%; top:68%;">
+      <div class="ikon" id="drakonIkon">➕</div>
+      <div class="nom" id="drakonNom">Drakon yo'q</div>
+    </div>
+  </div>
+
+  <!-- Pastdagi boshqaruv tugmalari -->
+  <div class="boshqaruv">
+    <button class="t yashil" id="tuxumTugma">🥚 Tuxum sotib olish (100🪙)</button>
+    <button class="t" id="boqishTugma">🍖 Drakonni boqish (50🍖)</button>
+    <button class="t" id="uyTugma">🏛️ Uyni yaxshilash</button>
+    <button class="t" id="ormonTugma">🌲 O'rmon (yog'och yig'ish)</button>
+    <button class="t" id="muzTugma">🧊 Muzlatgich yaxshilash</button>
+    <button class="t" id="devorTugma">🧱 Devorni yaxshilash</button>
+    <button class="t muhim" id="hujumTugma">⚔️ Dushman hujumini sinash</button>
+  </div>
 
 
   <!-- ===================== JavaScript = O'YIN MIYASI ===================== -->
   <script>
-    // ---- 1) O'yin xotirasi (o'zgaruvchilar = qutilar ichida saqlanadigan sonlar) ----
-    let oltin = 0;        // hozircha qancha oltin bor
-    let kuch = 1;         // bir bosishda nechta oltin kelishi
-    let narx = 50;        // yaxshilash narxi
+  /* ----------------------------------------------------------------
+     1) O'YIN XOTIRASI - barcha sonlar shu yerda saqlanadi
+     ---------------------------------------------------------------- */
+  let oyin = {
+    yogoch: 50,
+    gosht: 50,
+    pul: 150,
 
-    // ---- 2) Ekrandagi elementlarni "ushlab olamiz" ----
-    const oltinSoniYozuv = document.getElementById("oltinSoni");
-    const kuchYozuv       = document.getElementById("kuch");
-    const konTugma        = document.getElementById("kon");
-    const upgradeTugma     = document.getElementById("upgradeTugma");
+    uyLvl: 1,
+    ormonLvl: 1,
+    muzLvl: 1,
+    devorLvl: 1,
 
-    // ---- 3) Ekranni yangilaydigan funksiya (takror ishlatiladigan buyruqlar to'plami) ----
-    function ekranniYangila() {
-      oltinSoniYozuv.textContent = oltin;
-      kuchYozuv.textContent = kuch;
-      upgradeTugma.textContent = "Yaxshilash (" + narx + " 🪙) — har bosishga +1";
-      // Agar oltin yetmasa, tugmani o'chiramiz
-      upgradeTugma.disabled = (oltin < narx);
+    // Drakon holati:
+    // "yoq"=hali yo'q, "tuxum"=tuxumda, "tirik"=jangga tayyor, "kasal"=davolanyapti
+    drakonHolat: "yoq",
+    drakonLvl: 0,
+    tuxumOchilishVaqti: 0,   // tuxum qachon ochilishi (vaqt belgisi)
+    kasalTugashVaqti: 0      // kasallik qachon tugashi (vaqt belgisi)
+  };
+
+  /* ----------------------------------------------------------------
+     2) EKRANDAGI ELEMENTLARNI USHLAB OLAMIZ
+     ---------------------------------------------------------------- */
+  const E = (id) => document.getElementById(id);  // qisqa yordamchi
+
+  /* ----------------------------------------------------------------
+     3) XABAR KO'RSATISH (ekran tepasida chiqadigan bildirishnoma)
+     ---------------------------------------------------------------- */
+  let xabarVaqt;
+  function xabar(matn) {
+    const x = E("xabar");
+    x.textContent = matn;
+    x.classList.add("kor");
+    clearTimeout(xabarVaqt);
+    xabarVaqt = setTimeout(() => x.classList.remove("kor"), 2200);
+  }
+
+  /* ----------------------------------------------------------------
+     4) NARXLARNI HISOBLASH (daraja oshgan sari qimmatlashadi)
+     ---------------------------------------------------------------- */
+  function uyNarx()    { return oyin.uyLvl * 100; }        // pul
+  function ormonNarx() { return oyin.ormonLvl * 40; }      // pul
+  function muzNarx()   { return oyin.muzLvl * 60; }        // yog'och
+  function devorNarx() { return oyin.devorLvl * 50; }      // yog'och
+
+  // Go'sht ombori sig'imi (muzlatgich darajasiga bog'liq)
+  function goshtSigim() { return oyin.muzLvl * 100; }
+
+  /* ----------------------------------------------------------------
+     5) EKRANNI YANGILASH - sonlarni va tugmalarni qayta chizamiz
+     ---------------------------------------------------------------- */
+  function yangila() {
+    // Resurslar
+    E("yogochYoz").textContent = Math.floor(oyin.yogoch);
+    E("goshtYoz").textContent  = Math.floor(oyin.gosht) + " / " + goshtSigim();
+    E("pulYoz").textContent    = Math.floor(oyin.pul);
+
+    // Binolar darajasi
+    E("uyLvlYoz").textContent    = oyin.uyLvl;
+    E("muzLvlYoz").textContent   = oyin.muzLvl;
+    E("devorLvlYoz").textContent = oyin.devorLvl;
+
+    // Tugma yozuvlari (narx bilan)
+    E("uyTugma").textContent    = "🏛️ Uyni yaxshilash (" + uyNarx() + "🪙)";
+    E("ormonTugma").textContent = "🌲 O'rmon yaxshilash (" + ormonNarx() + "🪙)";
+    E("muzTugma").textContent   = "🧊 Muzlatgich yaxshilash (" + muzNarx() + "🪵)";
+    E("devorTugma").textContent = "🧱 Devorni yaxshilash (" + devorNarx() + "🪵)";
+
+    // --- DRAKON ko'rinishi holatiga qarab ---
+    const ob = E("drakonObyekt");
+    ob.classList.remove("kasal");
+    if (oyin.drakonHolat === "yoq") {
+      E("drakonIkon").textContent = "➕";
+      E("drakonNom").textContent = "Drakon yo'q";
+    } else if (oyin.drakonHolat === "tuxum") {
+      const qoldi = Math.ceil((oyin.tuxumOchilishVaqti - Date.now()) / 1000);
+      E("drakonIkon").textContent = "🥚";
+      E("drakonNom").textContent = "Ochilmoqda: " + qoldi + "s";
+    } else if (oyin.drakonHolat === "tirik") {
+      // Daraja oshgan sari drakon kattaroq ko'rinadi
+      E("drakonIkon").textContent = oyin.drakonLvl < 3 ? "🐣" : "🐉";
+      E("drakonNom").textContent = "Drakon " + oyin.drakonLvl + "-dr (kuch:" + drakonKuchi() + ")";
+    } else if (oyin.drakonHolat === "kasal") {
+      const qoldi = Math.ceil((oyin.kasalTugashVaqti - Date.now()) / 1000);
+      ob.classList.add("kasal");
+      E("drakonIkon").textContent = "🤒";
+      E("drakonNom").textContent = "Kasal: " + qoldi + "s";
     }
 
-    // ---- 4) KONNI BOSGANDA nima bo'lishi ----
-    konTugma.addEventListener("click", function(hodisa) {
-      oltin = oltin + kuch;     // oltinni ko'paytiramiz
-      ekranniYangila();         // ekranni yangilaymiz
-      uchayotganRaqam(hodisa);  // "+kuch" raqamini uchirib chiqaramiz
-      saqla();                  // o'yinni saqlaymiz
-    });
+    // Tugmalarni yoqish/o'chirish (yetarli resurs bo'lsa yoqamiz)
+    E("tuxumTugma").disabled  = (oyin.drakonHolat !== "yoq") || (oyin.pul < 100);
+    E("boqishTugma").disabled = (oyin.drakonHolat !== "tirik") || (oyin.gosht < 50);
+    E("uyTugma").disabled     = (oyin.pul < uyNarx());
+    E("ormonTugma").disabled  = (oyin.pul < ormonNarx());
+    E("muzTugma").disabled    = (oyin.yogoch < muzNarx());
+    E("devorTugma").disabled  = (oyin.yogoch < devorNarx());
+  }
 
-    // ---- 5) YAXSHILASH tugmasini bosganda ----
-    upgradeTugma.addEventListener("click", function() {
-      if (oltin >= narx) {          // agar yetarli oltin bo'lsa
-        oltin = oltin - narx;       // oltindan ayiramiz
-        kuch = kuch + 1;            // kuchni oshiramiz
-        narx = Math.round(narx * 1.5); // keyingi narx qimmatroq bo'ladi
-        ekranniYangila();
-        saqla();
+  /* ----------------------------------------------------------------
+     6) DRAKON KUCHI - daraja qancha katta bo'lsa, shuncha kuchli
+     ---------------------------------------------------------------- */
+  function drakonKuchi() {
+    if (oyin.drakonHolat !== "tirik") return 0;  // kasal yoki yo'q bo'lsa kuchi 0
+    return oyin.drakonLvl * 20;
+  }
+  // Devor ham himoyaga kuch qo'shadi
+  function devorKuchi() { return oyin.devorLvl * 15; }
+
+  /* ----------------------------------------------------------------
+     7) TUGMALAR BOSILGANDA NIMA BO'LISHI
+     ---------------------------------------------------------------- */
+
+  // Tuxum sotib olish
+  E("tuxumTugma").onclick = () => {
+    oyin.pul -= 100;
+    oyin.drakonHolat = "tuxum";
+    oyin.drakonLvl = 1;
+    oyin.tuxumOchilishVaqti = Date.now() + 30000; // 30 soniyada ochiladi
+    xabar("🥚 Tuxum sotib olindi! 30 soniyada ochiladi.");
+    yangila(); saqla();
+  };
+
+  // Drakonni boqish (go'sht beramiz -> daraja oshadi)
+  E("boqishTugma").onclick = () => {
+    oyin.gosht -= 50;
+    oyin.drakonLvl += 1;
+    xabar("🍖 Drakon o'sdi! Endi " + oyin.drakonLvl + "-daraja.");
+    yangila(); saqla();
+  };
+
+  // Binolarni yaxshilash
+  E("uyTugma").onclick = () => {
+    oyin.pul -= uyNarx(); oyin.uyLvl += 1;
+    xabar("🏛️ Asosiy uy yaxshilandi!"); yangila(); saqla();
+  };
+  E("ormonTugma").onclick = () => {
+    oyin.pul -= ormonNarx(); oyin.ormonLvl += 1;
+    xabar("🌲 O'rmon yaxshilandi! Ko'proq yog'och keladi."); yangila(); saqla();
+  };
+  E("muzTugma").onclick = () => {
+    oyin.yogoch -= muzNarx(); oyin.muzLvl += 1;
+    xabar("🧊 Muzlatgich yaxshilandi! Ko'proq go'sht sig'adi."); yangila(); saqla();
+  };
+  E("devorTugma").onclick = () => {
+    oyin.yogoch -= devorNarx(); oyin.devorLvl += 1;
+    xabar("🧱 Devor mustahkamlandi!"); yangila(); saqla();
+  };
+
+  /* ----------------------------------------------------------------
+     8) DUSHMAN HUJUMI - eng muhim qism (himoya + drakon kasalligi)
+     ---------------------------------------------------------------- */
+  E("hujumTugma").onclick = () => dushmanHujumi();
+
+  function dushmanHujumi() {
+    // Dushman kuchi - uy darajasiga qarab kuchayadi (tasodifiy)
+    const dushmanKuchi = 30 + Math.floor(Math.random() * (oyin.uyLvl * 40));
+
+    // Bizning himoyamiz = drakon kuchi + devor kuchi
+    const himoya = drakonKuchi() + devorKuchi();
+
+    xabar("⚔️ Dushman keldi! Kuchi: " + dushmanKuchi + " | Himoya: " + himoya);
+
+    setTimeout(() => {
+      if (himoya >= dushmanKuchi) {
+        // ----- G'ALABA -----
+        const mukofot = 30 + Math.floor(Math.random() * 50);
+        oyin.pul += mukofot;
+        xabar("🛡️ G'ALABA! Dushman qaytarildi. +" + mukofot + "🪙");
+      } else {
+        // ----- MAG'LUBIYAT -----
+        // Dushman go'shtni o'g'irlaydi
+        const ogirlangan = Math.floor(oyin.gosht * 0.5);
+        oyin.gosht -= ogirlangan;
+
+        // Agar drakon jangda qatnashgan bo'lsa, kasal bo'ladi.
+        // Kasallik vaqti = daraja qancha katta bo'lsa, shuncha uzoq!
+        if (oyin.drakonHolat === "tirik") {
+          const kasalSoniya = oyin.drakonLvl * 15; // har daraja = +15 soniya
+          oyin.drakonHolat = "kasal";
+          oyin.kasalTugashVaqti = Date.now() + kasalSoniya * 1000;
+          xabar("💔 MAG'LUBIYAT! " + ogirlangan + "🍖 o'g'irlandi. Drakon " + kasalSoniya + "s kasal bo'ldi!");
+        } else {
+          xabar("💔 MAG'LUBIYAT! Dushman " + ogirlangan + "🍖 go'sht o'g'irladi!");
+        }
       }
-    });
+      yangila(); saqla();
+    }, 700);
+  }
 
-    // ---- 6) "+1" raqamini uchirib chiqaradigan funksiya (chiroyli effekt) ----
-    function uchayotganRaqam(hodisa) {
-      const raqam = document.createElement("div");
-      raqam.className = "uchadigan";
-      raqam.textContent = "+" + kuch;
-      raqam.style.left = (hodisa.clientX - 10) + "px";
-      raqam.style.top  = (hodisa.clientY - 30) + "px";
-      document.body.appendChild(raqam);
-      // 0.8 soniyadan keyin raqamni o'chiramiz
-      setTimeout(function() { raqam.remove(); }, 800);
+  /* ----------------------------------------------------------------
+     9) VAQT G'ILDIRAGI - har soniyada ishlaydigan buyruqlar
+        (resurs ishlab chiqarish, tuxum ochilishi, kasallikdan tuzalish)
+     ---------------------------------------------------------------- */
+  setInterval(() => {
+    // O'rmon ishchilari yog'och yig'adi (daraja = tezlik)
+    oyin.yogoch += oyin.ormonLvl;
+
+    // Muzlatgich go'sht ishlab chiqaradi (sig'imdan oshmaydi)
+    if (oyin.gosht < goshtSigim()) {
+      oyin.gosht += oyin.muzLvl;
+      if (oyin.gosht > goshtSigim()) oyin.gosht = goshtSigim();
     }
 
-    // ---- 7) O'yinni saqlash va yuklash (telefon yopilsa ham unutmaydi) ----
-    function saqla() {
-      localStorage.setItem("oltin", oltin);
-      localStorage.setItem("kuch", kuch);
-      localStorage.setItem("narx", narx);
-    }
-    function yukla() {
-      if (localStorage.getItem("oltin") !== null) {
-        oltin = Number(localStorage.getItem("oltin"));
-        kuch  = Number(localStorage.getItem("kuch"));
-        narx  = Number(localStorage.getItem("narx"));
-      }
+    // Tuxum vaqti kelganda ochiladi
+    if (oyin.drakonHolat === "tuxum" && Date.now() >= oyin.tuxumOchilishVaqti) {
+      oyin.drakonHolat = "tirik";
+      xabar("🎉 Tuxum ochildi! Drakon dunyoga keldi!");
     }
 
-    // ---- 8) O'yin boshlanganda: saqlangan ma'lumotni yuklab, ekranni chizamiz ----
-    yukla();
-    ekranniYangila();
+    // Kasallik vaqti tugaganda drakon tuzaladi
+    if (oyin.drakonHolat === "kasal" && Date.now() >= oyin.kasalTugashVaqti) {
+      oyin.drakonHolat = "tirik";
+      xabar("💚 Drakon sog'aydi! Yana jangga tayyor.");
+    }
+
+    yangila();
+  }, 1000); // 1000 millisoniya = 1 soniya
+
+  /* ----------------------------------------------------------------
+     10) SAQLASH va YUKLASH (brauzer yopilsa ham unutmaydi)
+     ---------------------------------------------------------------- */
+  function saqla() {
+    localStorage.setItem("drakonBazasi", JSON.stringify(oyin));
+  }
+  function yukla() {
+    const saqlangan = localStorage.getItem("drakonBazasi");
+    if (saqlangan) {
+      oyin = JSON.parse(saqlangan);
+    }
+  }
+
+  /* ----------------------------------------------------------------
+     11) O'YINNI BOSHLASH
+     ---------------------------------------------------------------- */
+  yukla();
+  yangila();
   </script>
 </body>
 </html>

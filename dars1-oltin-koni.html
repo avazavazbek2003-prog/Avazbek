@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     OLTIN KONI - 1-o'yin
+     Bu fayl butun o'yin. Telefonda Chrome'da ochib o'ynang.
+     Pastdagi har bir qism o'zbek tilida izohlangan.
+     ============================================================ -->
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <!-- Pastdagi qator o'yinni TELEFON ekraniga moslaydi -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Oltin Koni</title>
+
+  <!-- ===================== CSS = O'YIN KIYIMI ===================== -->
+  <style>
+    /* Butun sahifaning umumiy ko'rinishi */
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: Arial, sans-serif;
+      /* Orqa fon - osmon va o'tloq rangi */
+      background: linear-gradient(#4ec0e9 0%, #4ec0e9 55%, #6abe30 55%, #4a8c20 100%);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    /* Yuqoridagi hisob paneli (oltin va daraja) */
+    .panel {
+      margin-top: 30px;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      padding: 14px 26px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .panel .oltin { font-size: 34px; font-weight: bold; color: #ffd54a; }
+    .panel .daraja { font-size: 16px; margin-top: 4px; opacity: 0.9; }
+
+    /* Oltin koni tugmasi (bosiladigan asosiy narsa) */
+    .kon {
+      margin-top: 60px;
+      font-size: 120px;
+      cursor: pointer;
+      transition: transform 0.08s;
+      filter: drop-shadow(0 8px 6px rgba(0,0,0,0.35));
+    }
+    /* Bosilganda biroz kichrayadi - "bosildi" hissi beradi */
+    .kon:active { transform: scale(0.88); }
+
+    .yozuv { color: #fff; margin-top: 18px; font-size: 17px; text-shadow: 0 2px 3px rgba(0,0,0,0.4); }
+
+    /* Yaxshilash tugmasi */
+    .upgrade {
+      margin-top: auto;
+      margin-bottom: 40px;
+      background: #ffb300;
+      border: none;
+      color: #4a2c00;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 16px 30px;
+      border-radius: 16px;
+      box-shadow: 0 5px 0 #c98a00;
+      cursor: pointer;
+    }
+    .upgrade:active { transform: translateY(4px); box-shadow: 0 1px 0 #c98a00; }
+    .upgrade:disabled { background: #999; box-shadow: 0 5px 0 #666; color: #ddd; }
+
+    /* Bosilganda "+1" raqami uchib chiqishi (animatsiya) */
+    .uchadigan {
+      position: absolute;
+      color: #ffd54a;
+      font-size: 28px;
+      font-weight: bold;
+      pointer-events: none;
+      animation: uchish 0.8s ease-out forwards;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+    }
+    @keyframes uchish {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-80px); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===================== HTML = O'YIN SUYAGI ===================== -->
+
+  <!-- Yuqoridagi panel: oltin miqdori va daraja -->
+  <div class="panel">
+    <div class="oltin"><span id="oltinSoni">0</span> 🪙</div>
+    <div class="daraja">Bir bosishda: <span id="kuch">1</span> oltin</div>
+  </div>
+
+  <!-- Asosiy oltin koni - shuni bosamiz -->
+  <div class="kon" id="kon">⛏️</div>
+  <div class="yozuv">👆 Konni bosib oltin yig'!</div>
+
+  <!-- Yaxshilash tugmasi -->
+  <button class="upgrade" id="upgradeTugma">
+    Yaxshilash (50 🪙) — har bosishga +1
+  </button>
+
+
+  <!-- ===================== JavaScript = O'YIN MIYASI ===================== -->
+  <script>
+    // ---- 1) O'yin xotirasi (o'zgaruvchilar = qutilar ichida saqlanadigan sonlar) ----
+    let oltin = 0;        // hozircha qancha oltin bor
+    let kuch = 1;         // bir bosishda nechta oltin kelishi
+    let narx = 50;        // yaxshilash narxi
+
+    // ---- 2) Ekrandagi elementlarni "ushlab olamiz" ----
+    const oltinSoniYozuv = document.getElementById("oltinSoni");
+    const kuchYozuv       = document.getElementById("kuch");
+    const konTugma        = document.getElementById("kon");
+    const upgradeTugma     = document.getElementById("upgradeTugma");
+
+    // ---- 3) Ekranni yangilaydigan funksiya (takror ishlatiladigan buyruqlar to'plami) ----
+    function ekranniYangila() {
+      oltinSoniYozuv.textContent = oltin;
+      kuchYozuv.textContent = kuch;
+      upgradeTugma.textContent = "Yaxshilash (" + narx + " 🪙) — har bosishga +1";
+      // Agar oltin yetmasa, tugmani o'chiramiz
+      upgradeTugma.disabled = (oltin < narx);
+    }
+
+    // ---- 4) KONNI BOSGANDA nima bo'lishi ----
+    konTugma.addEventListener("click", function(hodisa) {
+      oltin = oltin + kuch;     // oltinni ko'paytiramiz
+      ekranniYangila();         // ekranni yangilaymiz
+      uchayotganRaqam(hodisa);  // "+kuch" raqamini uchirib chiqaramiz
+      saqla();                  // o'yinni saqlaymiz
+    });
+
+    // ---- 5) YAXSHILASH tugmasini bosganda ----
+    upgradeTugma.addEventListener("click", function() {
+      if (oltin >= narx) {          // agar yetarli oltin bo'lsa
+        oltin = oltin - narx;       // oltindan ayiramiz
+        kuch = kuch + 1;            // kuchni oshiramiz
+        narx = Math.round(narx * 1.5); // keyingi narx qimmatroq bo'ladi
+        ekranniYangila();
+        saqla();
+      }
+    });
+
+    // ---- 6) "+1" raqamini uchirib chiqaradigan funksiya (chiroyli effekt) ----
+    function uchayotganRaqam(hodisa) {
+      const raqam = document.createElement("div");
+      raqam.className = "uchadigan";
+      raqam.textContent = "+" + kuch;
+      raqam.style.left = (hodisa.clientX - 10) + "px";
+      raqam.style.top  = (hodisa.clientY - 30) + "px";
+      document.body.appendChild(raqam);
+      // 0.8 soniyadan keyin raqamni o'chiramiz
+      setTimeout(function() { raqam.remove(); }, 800);
+    }
+
+    // ---- 7) O'yinni saqlash va yuklash (telefon yopilsa ham unutmaydi) ----
+    function saqla() {
+      localStorage.setItem("oltin", oltin);
+      localStorage.setItem("kuch", kuch);
+      localStorage.setItem("narx", narx);
+    }
+    function yukla() {
+      if (localStorage.getItem("oltin") !== null) {
+        oltin = Number(localStorage.getItem("oltin"));
+        kuch  = Number(localStorage.getItem("kuch"));
+        narx  = Number(localStorage.getItem("narx"));
+      }
+    }
+
+    // ---- 8) O'yin boshlanganda: saqlangan ma'lumotni yuklab, ekranni chizamiz ----
+    yukla();
+    ekranniYangila();
+  </script>
+</body>
+</html>
