@@ -173,16 +173,57 @@ body{background:#0b0f1a;color:#fff;height:100vh;overflow:hidden;display:flex;fle
   <button class="btn red" id="hujumTugma">⚔️ Dushman hujumini sinash</button>
 </div>
 <script>
-let oyin={yogoch:50,gosht:50,pul:150,uyLvl:1,ormonLvl:1,muzLvl:1,devorLvl:1,drakonHolat:"yoq",drakonLvl:0,tuxumOchilishVaqti:0,kasalTugashVaqti:0};
+let oyin={yogoch:50,gosht:50,pul:150,uyLvl:1,ormonLvl:1,muzLvl:1,devorLvl:1,drakonTur:0,drakonHolat:"yoq",drakonLvl:0,tuxumOchilishVaqti:0,kasalTugashVaqti:0};
 const E=(id)=>document.getElementById(id);
 let xt;function xabar(m){const x=E("xabar");x.textContent=m;x.classList.add("kor");clearTimeout(xt);xt=setTimeout(()=>x.classList.remove("kor"),2400);}
 const uyNarx=()=>oyin.uyLvl*100,ormonNarx=()=>oyin.ormonLvl*40,muzNarx=()=>oyin.muzLvl*60,devorNarx=()=>oyin.devorLvl*50,goshtSigim=()=>oyin.muzLvl*100;
 const drakonKuchi=()=>oyin.drakonHolat==="tirik"?oyin.drakonLvl*20:0;
 const devorKuchi=()=>oyin.devorLvl*15;
 
+/* === 3 XIL DRAKON TURI (rang + ovoz) === */
+const turlar=[
+  {nom:"🔥 Olov",  rang:"#e0522a", rang2:"#9a2c12"},
+  {nom:"❄️ Muz",   rang:"#3da9e0", rang2:"#1f5f9a"},
+  {nom:"☠️ Zahar", rang:"#5fbf3a", rang2:"#2e6e1f"}
+];
+
+/* === OVOZ (brauzerda sintez qilinadi) === */
+let AC=null;
+function ac(){if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();return AC;}
+function bukir(tur){
+  try{
+    const a=ac(); if(a.state==="suspended")a.resume();
+    const t=a.currentTime;
+    const dur = tur===1?0.65:0.95;                 // muz qisqaroq
+    const baseF= tur===0?85 : tur===1?330 : 150;   // olov past, muz baland, zahar o'rta
+    // asosiy bo'kirish (balandlikni pasaytiramiz)
+    const o=a.createOscillator();
+    o.type = tur===0?"sawtooth" : tur===1?"square" : "triangle";
+    o.frequency.setValueAtTime(baseF*1.7,t);
+    o.frequency.exponentialRampToValueAtTime(baseF,t+dur);
+    const g=a.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.55,t+0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    // titroq (xirillash effekti)
+    const lfo=a.createOscillator(); lfo.frequency.value = tur===0?28 : tur===2?45 : 16;
+    const lfoG=a.createGain(); lfoG.gain.value=0.28;
+    lfo.connect(lfoG); lfoG.connect(g.gain);
+    o.connect(g); g.connect(a.destination);
+    // shovqin qatlami (nafas/o't)
+    const n=Math.floor(a.sampleRate*dur), buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+    const noise=a.createBufferSource(); noise.buffer=buf;
+    const nf=a.createBiquadFilter(); nf.type="lowpass"; nf.frequency.value=tur===1?2600:900;
+    const ng=a.createGain(); ng.gain.setValueAtTime(tur===2?0.4:0.22,t); ng.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    noise.connect(nf); nf.connect(ng); ng.connect(a.destination);
+    o.start(t); o.stop(t+dur); lfo.start(t); lfo.stop(t+dur); noise.start(t); noise.stop(t+dur);
+  }catch(e){}
+}
+
 function tuxumSvg(){return '<g transform="translate(135,60)"><ellipse cx="40" cy="60" rx="26" ry="8" fill="#000" opacity=".25"/><ellipse cx="40" cy="24" rx="22" ry="30" fill="#f3e3bf" stroke="#cbb98a" stroke-width="2"/><circle cx="32" cy="14" r="4" fill="#d8c79a"/><circle cx="50" cy="26" r="5" fill="#d8c79a"/><path d="M30 4 l6 8 l-5 6 l8 4" fill="none" stroke="#b09a63" stroke-width="1.5"/></g>';}
-function bolaSvg(){return '<g transform="translate(120,40)"><ellipse cx="50" cy="78" rx="34" ry="8" fill="#000" opacity=".25"/><ellipse cx="50" cy="55" rx="26" ry="22" fill="#e0522a"/><circle cx="50" cy="30" r="18" fill="#e0522a"/><polygon points="40,16 46,2 52,16" fill="#8e2412"/><polygon points="60,16 54,2 50,16" fill="#8e2412"/><circle cx="44" cy="28" r="4" fill="#fff"/><circle cx="45" cy="29" r="2" fill="#000"/><circle cx="56" cy="28" r="4" fill="#fff"/><circle cx="55" cy="29" r="2" fill="#000"/><ellipse cx="50" cy="38" rx="8" ry="5" fill="#ffb98a"/><path d="M26 52 q-16 -6 -12 12 q12 -4 14 2 Z" fill="#b8331a"/><path d="M74 52 q16 -6 12 12 q-12 -4 -14 2 Z" fill="#b8331a"/></g>';}
-function kattaSvg(){return '<g transform="translate(70,30)"><ellipse cx="90" cy="118" rx="64" ry="11" fill="#000" opacity=".3"/><path d="M70 60 C16 24 -6 52 8 94 C30 70 52 78 66 86 Z" fill="#b8331a"/><path d="M110 60 C164 24 186 52 172 94 C150 70 128 78 114 86 Z" fill="#b8331a"/><path d="M90 110 q40 30 80 10 q-30 -6 -46 -28" fill="#d8442a"/><ellipse cx="68" cy="116" rx="12" ry="9" fill="#a82c16"/><ellipse cx="112" cy="116" rx="12" ry="9" fill="#a82c16"/><ellipse cx="90" cy="90" rx="40" ry="32" fill="#e0522a"/><path d="M62 90 q28 24 56 0 q-8 20 -28 22 q-20 -2 -28 -22" fill="#ffcaa0"/><path d="M78 62 C72 36 92 22 104 22 C120 22 120 44 108 56 Z" fill="#e0522a"/><ellipse cx="112" cy="34" rx="22" ry="18" fill="#e0522a"/><polygon points="100,18 96,-2 108,14" fill="#e9dcc0"/><polygon points="118,16 124,-4 128,14" fill="#e9dcc0"/><ellipse cx="112" cy="32" rx="5" ry="6" fill="#fff"/><circle cx="113" cy="33" r="3" fill="#111"/><polygon points="130,40 134,48 126,46" fill="#fff"/><path d="M70 64 l6 -10 l6 10 M82 60 l6 -12 l6 12 M94 60 l6 -10 l6 10" fill="#8e2412"/></g>';}
+function bolaSvg(){const t=turlar[oyin.drakonTur]||turlar[0];return '<g transform="translate(120,40)"><ellipse cx="50" cy="78" rx="34" ry="8" fill="#000" opacity=".25"/><ellipse cx="50" cy="55" rx="26" ry="22" fill="'+t.rang+'"/><circle cx="50" cy="30" r="18" fill="'+t.rang+'"/><polygon points="40,16 46,2 52,16" fill="'+t.rang2+'"/><polygon points="60,16 54,2 50,16" fill="'+t.rang2+'"/><circle cx="44" cy="28" r="4" fill="#fff"/><circle cx="45" cy="29" r="2" fill="#000"/><circle cx="56" cy="28" r="4" fill="#fff"/><circle cx="55" cy="29" r="2" fill="#000"/><ellipse cx="50" cy="38" rx="8" ry="5" fill="#ffd9b0"/><path d="M26 52 q-16 -6 -12 12 q12 -4 14 2 Z" fill="'+t.rang2+'"/><path d="M74 52 q16 -6 12 12 q-12 -4 -14 2 Z" fill="'+t.rang2+'"/></g>';}
+function kattaSvg(){const t=turlar[oyin.drakonTur]||turlar[0];return '<g transform="translate(70,30)"><ellipse cx="90" cy="118" rx="64" ry="11" fill="#000" opacity=".3"/><path d="M70 60 C16 24 -6 52 8 94 C30 70 52 78 66 86 Z" fill="'+t.rang2+'"/><path d="M110 60 C164 24 186 52 172 94 C150 70 128 78 114 86 Z" fill="'+t.rang2+'"/><path d="M90 110 q40 30 80 10 q-30 -6 -46 -28" fill="'+t.rang+'"/><ellipse cx="68" cy="116" rx="12" ry="9" fill="'+t.rang2+'"/><ellipse cx="112" cy="116" rx="12" ry="9" fill="'+t.rang2+'"/><ellipse cx="90" cy="90" rx="40" ry="32" fill="'+t.rang+'"/><path d="M62 90 q28 24 56 0 q-8 20 -28 22 q-20 -2 -28 -22" fill="#ffcaa0"/><path d="M78 62 C72 36 92 22 104 22 C120 22 120 44 108 56 Z" fill="'+t.rang+'"/><ellipse cx="112" cy="34" rx="22" ry="18" fill="'+t.rang+'"/><polygon points="100,18 96,-2 108,14" fill="#e9dcc0"/><polygon points="118,16 124,-4 128,14" fill="#e9dcc0"/><ellipse cx="112" cy="32" rx="5" ry="6" fill="#fff"/><circle cx="113" cy="33" r="3" fill="#111"/><polygon points="130,40 134,48 126,46" fill="#fff"/><path d="M70 64 l6 -10 l6 10 M82 60 l6 -12 l6 12 M94 60 l6 -10 l6 10" fill="'+t.rang2+'"/></g>';}
 
 function yangila(){
   E("yogochYoz").textContent=Math.floor(oyin.yogoch);
@@ -194,22 +235,28 @@ function yangila(){
   const art=E("drakonArt");art.classList.remove("kasal");
   if(oyin.drakonHolat==="yoq"){art.innerHTML="";E("drakonNom").textContent="Drakon yo'q (tuxum oling)";}
   else if(oyin.drakonHolat==="tuxum"){art.innerHTML=tuxumSvg();const q=Math.ceil((oyin.tuxumOchilishVaqti-Date.now())/1000);E("drakonNom").textContent="🥚 Ochilmoqda: "+q+"s";}
-  else if(oyin.drakonHolat==="tirik"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();E("drakonNom").textContent="🐉 Drakon "+oyin.drakonLvl+"-dr · kuch "+drakonKuchi();}
+  else if(oyin.drakonHolat==="tirik"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();E("drakonNom").textContent=(turlar[oyin.drakonTur]||turlar[0]).nom+" "+oyin.drakonLvl+"-dr · kuch "+drakonKuchi();}
   else if(oyin.drakonHolat==="kasal"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();art.classList.add("kasal");const q=Math.ceil((oyin.kasalTugashVaqti-Date.now())/1000);E("drakonNom").textContent="🤒 Kasal: "+q+"s";}
   E("tuxumTugma").disabled=(oyin.drakonHolat!=="yoq")||(oyin.pul<100);
   E("boqishTugma").disabled=(oyin.drakonHolat!=="tirik")||(oyin.gosht<50);
   E("uyTugma").disabled=oyin.pul<uyNarx();E("ormonTugma").disabled=oyin.pul<ormonNarx();
   E("muzTugma").disabled=oyin.yogoch<muzNarx();E("devorTugma").disabled=oyin.yogoch<devorNarx();
 }
-E("tuxumTugma").onclick=()=>{oyin.pul-=100;oyin.drakonHolat="tuxum";oyin.drakonLvl=1;oyin.tuxumOchilishVaqti=Date.now()+30000;xabar("🥚 Tuxum olindi! 30s da ochiladi.");yangila();saqla();};
+E("tuxumTugma").onclick=()=>{oyin.pul-=100;oyin.drakonTur=Math.floor(Math.random()*3);oyin.drakonHolat="tuxum";oyin.drakonLvl=1;oyin.tuxumOchilishVaqti=Date.now()+30000;bukir(oyin.drakonTur);xabar("🥚 Tuxum olindi! 30s da ochiladi.");yangila();saqla();};
 E("boqishTugma").onclick=()=>{oyin.gosht-=50;oyin.drakonLvl++;xabar("🍖 Drakon o'sdi! "+oyin.drakonLvl+"-daraja.");yangila();saqla();};
 E("uyTugma").onclick=()=>{oyin.pul-=uyNarx();oyin.uyLvl++;xabar("🏰 Qasr yaxshilandi!");yangila();saqla();};
 E("ormonTugma").onclick=()=>{oyin.pul-=ormonNarx();oyin.ormonLvl++;xabar("🌲 O'rmon yaxshilandi!");yangila();saqla();};
 E("muzTugma").onclick=()=>{oyin.yogoch-=muzNarx();oyin.muzLvl++;xabar("❄️ Ombor kengaydi!");yangila();saqla();};
 E("devorTugma").onclick=()=>{oyin.yogoch-=devorNarx();oyin.devorLvl++;xabar("🧱 Devor mustahkamlandi!");yangila();saqla();};
 E("hujumTugma").onclick=()=>dushmanHujumi();
+
+/* Drakonni bossang - bo'kiradi! */
+E("drakonArt").style.cursor="pointer";
+E("drakonArt").onclick=()=>{ if(oyin.drakonHolat==="tirik"||oyin.drakonHolat==="kasal") bukir(oyin.drakonTur); };
+
 function dushmanHujumi(){
   const dushman=30+Math.floor(Math.random()*(oyin.uyLvl*40));const himoya=drakonKuchi()+devorKuchi();
+  if(oyin.drakonHolat==="tirik") bukir(oyin.drakonTur);   // hujumda drakon bo'kiradi
   xabar("⚔️ Dushman keldi! Kuch "+dushman+" | Himoya "+himoya);
   setTimeout(()=>{
     if(himoya>=dushman){const m=30+Math.floor(Math.random()*50);oyin.pul+=m;xabar("🛡️ G'ALABA! +"+m+" 💰");}
@@ -222,12 +269,12 @@ function dushmanHujumi(){
 setInterval(()=>{
   oyin.yogoch+=oyin.ormonLvl;
   if(oyin.gosht<goshtSigim()){oyin.gosht+=oyin.muzLvl;if(oyin.gosht>goshtSigim())oyin.gosht=goshtSigim();}
-  if(oyin.drakonHolat==="tuxum"&&Date.now()>=oyin.tuxumOchilishVaqti){oyin.drakonHolat="tirik";xabar("🎉 Tuxum ochildi! Drakon tug'ildi!");}
+  if(oyin.drakonHolat==="tuxum"&&Date.now()>=oyin.tuxumOchilishVaqti){oyin.drakonHolat="tirik";bukir(oyin.drakonTur);xabar("🎉 "+(turlar[oyin.drakonTur]||turlar[0]).nom+" drakon tug'ildi!");}
   if(oyin.drakonHolat==="kasal"&&Date.now()>=oyin.kasalTugashVaqti){oyin.drakonHolat="tirik";xabar("💚 Drakon sog'aydi!");}
   yangila();
 },1000);
 function saqla(){localStorage.setItem("drakonQasri2",JSON.stringify(oyin));}
-function yukla(){const s=localStorage.getItem("drakonQasri2");if(s)oyin=JSON.parse(s);}
+function yukla(){const s=localStorage.getItem("drakonQasri2");if(s)oyin=JSON.parse(s);if(oyin.drakonTur===undefined)oyin.drakonTur=0;}
 yukla();yangila();
 </script>
 </body>
