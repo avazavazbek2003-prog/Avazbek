@@ -1,377 +1,234 @@
 <!DOCTYPE html>
-<!-- ================================================================
-     DRAKON QASRI  -  2-versiya (zamonaviy dizayn)
-     Telefonda o'ynaladigan baza qurish o'yini.
-     Butun grafika SVG (vektor) bilan chizilgan - har qanday ekranda toza.
-     ================================================================ -->
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Drakon Qasri</title>
-
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
-      font-family:'Segoe UI',system-ui,Arial,sans-serif;}
-    body{background:#0b0f1a;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;user-select:none;}
-
-    /* ===== Yuqori HUD (resurslar paneli - shisha effekti) ===== */
-    .hud{display:flex;gap:8px;padding:10px;background:rgba(10,14,26,.85);
-      backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.6);z-index:5;}
-    .chip{flex:1;display:flex;align-items:center;gap:8px;justify-content:center;
-      background:linear-gradient(180deg,#1c2438,#141a2a);border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;padding:8px 6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
-    .chip .ico{font-size:20px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
-    .chip .val{display:flex;flex-direction:column;line-height:1.1;}
-    .chip .val small{font-size:10px;color:#8a94ad;}
-    .chip .val b{font-size:16px;}
-    .yog .val b{color:#a3d977;} .gos .val b{color:#ff9d6e;} .pul .val b{color:#ffd34a;}
-
-    /* ===== Sahna (o'yin ko'rinadigan joy) ===== */
-    .sahna{flex:1;position:relative;overflow:hidden;background:#0b0f1a;}
-    .sahna svg{width:100%;height:100%;display:block;}
-    /* SVG ichidagi bosiladigan binolar */
-    .bino{cursor:pointer;transition:transform .12s;transform-origin:center bottom;}
-    .bino:active{transform:scale(.94);}
-
-    /* Drakon kasal bo'lganda xira */
-    #drakonArt.kasal{filter:grayscale(.85) brightness(.65);}
-
-    /* Suzib chiqadigan xabar */
-    .xabar{position:absolute;left:50%;top:12px;transform:translateX(-50%) translateY(-10px);
-      background:rgba(8,12,22,.92);border:1px solid rgba(255,211,74,.4);
-      padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;text-align:center;
-      max-width:92%;opacity:0;transition:.35s;pointer-events:none;z-index:6;
-      box-shadow:0 6px 20px rgba(0,0,0,.5);}
-    .xabar.kor{opacity:1;transform:translateX(-50%) translateY(0);}
-
-    /* ===== Pastki tugmalar ===== */
-    .panel{background:rgba(10,14,26,.95);padding:10px;display:grid;
-      grid-template-columns:1fr 1fr;gap:8px;max-height:40vh;overflow-y:auto;
-      box-shadow:0 -4px 20px rgba(0,0,0,.6);}
-    .btn{display:flex;flex-direction:column;align-items:center;gap:2px;
-      border:none;border-radius:14px;padding:10px 8px;font-size:13px;font-weight:700;color:#fff;
-      cursor:pointer;background:linear-gradient(180deg,#3b4d79,#2a3656);
-      box-shadow:0 4px 0 #1c2440,inset 0 1px 0 rgba(255,255,255,.12);}
-    .btn small{font-size:11px;font-weight:500;opacity:.85;}
-    .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1c2440;}
-    .btn:disabled{filter:grayscale(.7) brightness(.7);box-shadow:0 4px 0 #1a1a1a;}
-    .btn.green{background:linear-gradient(180deg,#3ec46d,#249a4e);box-shadow:0 4px 0 #166634;}
-    .btn.gold{background:linear-gradient(180deg,#ffc94a,#e0a020);color:#3a2600;box-shadow:0 4px 0 #a86f00;}
-    .btn.red{grid-column:span 2;background:linear-gradient(180deg,#ff5b5b,#c0392b);box-shadow:0 4px 0 #7d1f15;}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Drakon Qasri</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Segoe UI',system-ui,Arial,sans-serif;}
+body{background:#0b0f1a;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;user-select:none;}
+.hud{display:flex;gap:8px;padding:10px;background:rgba(10,14,26,.9);backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.6);z-index:5;}
+.chip{flex:1;display:flex;align-items:center;gap:8px;justify-content:center;background:linear-gradient(180deg,#1c2438,#141a2a);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:8px 6px;}
+.chip .ico{font-size:20px;}
+.chip .val{display:flex;flex-direction:column;line-height:1.1;}
+.chip .val small{font-size:10px;color:#8a94ad;}
+.chip .val b{font-size:16px;}
+.yog .val b{color:#a3d977;}.gos .val b{color:#ff9d6e;}.pul .val b{color:#ffd34a;}
+.sahna{flex:1;position:relative;overflow:hidden;background:linear-gradient(#bfe6f5,#8fd0ec);}
+.sahna svg{width:100%;height:100%;display:block;}
+#drakonArt.kasal{filter:grayscale(.85) brightness(.6);}
+.xabar{position:absolute;left:50%;top:12px;transform:translateX(-50%) translateY(-10px);background:rgba(8,12,22,.92);border:1px solid rgba(255,211,74,.4);padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;text-align:center;max-width:92%;opacity:0;transition:.35s;pointer-events:none;z-index:6;}
+.xabar.kor{opacity:1;transform:translateX(-50%) translateY(0);}
+.panel{background:rgba(10,14,26,.96);padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:38vh;overflow-y:auto;}
+.btn{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;border-radius:14px;padding:10px 8px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(180deg,#3b4d79,#2a3656);box-shadow:0 4px 0 #1c2440,inset 0 1px 0 rgba(255,255,255,.12);}
+.btn small{font-size:11px;font-weight:500;opacity:.85;}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1c2440;}
+.btn:disabled{filter:grayscale(.7) brightness(.7);box-shadow:0 4px 0 #1a1a1a;}
+.btn.green{background:linear-gradient(180deg,#3ec46d,#249a4e);box-shadow:0 4px 0 #166634;}
+.btn.gold{background:linear-gradient(180deg,#ffc94a,#e0a020);color:#3a2600;box-shadow:0 4px 0 #a86f00;}
+.btn.red{grid-column:span 2;background:linear-gradient(180deg,#ff5b5b,#c0392b);box-shadow:0 4px 0 #7d1f15;}
+</style>
 </head>
 <body>
+<div class="hud">
+  <div class="chip yog"><span class="ico">🪵</span><span class="val"><small>Yog'och</small><b id="yogochYoz">0</b></span></div>
+  <div class="chip gos"><span class="ico">🍖</span><span class="val"><small>Go'sht</small><b id="goshtYoz">0</b></span></div>
+  <div class="chip pul"><span class="ico">💰</span><span class="val"><small>Pul</small><b id="pulYoz">0</b></span></div>
+</div>
+<div class="sahna">
+  <div class="xabar" id="xabar"></div>
+<svg viewBox="0 0 400 370" preserveAspectRatio="xMidYMid meet">
+<polygon points="2.0,166.0 200.0,265.0 200.0,283.0 2.0,184.0" fill="#6a4a2a"/>
+<polygon points="200.0,265.0 398.0,166.0 398.0,184.0 200.0,283.0" fill="#54371f"/>
+<polygon points="200.0,67.0 398.0,166.0 200.0,265.0 2.0,166.0" fill="#5b8f33"/>
+<polygon points="200.0,67.0 222.0,78.0 200.0,89.0 178.0,78.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,78.0 244.0,89.0 222.0,100.0 200.0,89.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,89.0 266.0,100.0 244.0,111.0 222.0,100.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="266.0,100.0 288.0,111.0 266.0,122.0 244.0,111.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="288.0,111.0 310.0,122.0 288.0,133.0 266.0,122.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="310.0,122.0 332.0,133.0 310.0,144.0 288.0,133.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="332.0,133.0 354.0,144.0 332.0,155.0 310.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="354.0,144.0 376.0,155.0 354.0,166.0 332.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="376.0,155.0 398.0,166.0 376.0,177.0 354.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,78.0 200.0,89.0 178.0,100.0 156.0,89.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,89.0 222.0,100.0 200.0,111.0 178.0,100.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,100.0 244.0,111.0 222.0,122.0 200.0,111.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,111.0 266.0,122.0 244.0,133.0 222.0,122.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="266.0,122.0 288.0,133.0 266.0,144.0 244.0,133.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="288.0,133.0 310.0,144.0 288.0,155.0 266.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="310.0,144.0 332.0,155.0 310.0,166.0 288.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="332.0,155.0 354.0,166.0 332.0,177.0 310.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="354.0,166.0 376.0,177.0 354.0,188.0 332.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,89.0 178.0,100.0 156.0,111.0 134.0,100.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,100.0 200.0,111.0 178.0,122.0 156.0,111.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,111.0 222.0,122.0 200.0,133.0 178.0,122.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,122.0 244.0,133.0 222.0,144.0 200.0,133.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,133.0 266.0,144.0 244.0,155.0 222.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="266.0,144.0 288.0,155.0 266.0,166.0 244.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="288.0,155.0 310.0,166.0 288.0,177.0 266.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="310.0,166.0 332.0,177.0 310.0,188.0 288.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="332.0,177.0 354.0,188.0 332.0,199.0 310.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="134.0,100.0 156.0,111.0 134.0,122.0 112.0,111.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,111.0 178.0,122.0 156.0,133.0 134.0,122.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,122.0 200.0,133.0 178.0,144.0 156.0,133.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,133.0 222.0,144.0 200.0,155.0 178.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,144.0 244.0,155.0 222.0,166.0 200.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,155.0 266.0,166.0 244.0,177.0 222.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="266.0,166.0 288.0,177.0 266.0,188.0 244.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="288.0,177.0 310.0,188.0 288.0,199.0 266.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="310.0,188.0 332.0,199.0 310.0,210.0 288.0,199.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="112.0,111.0 134.0,122.0 112.0,133.0 90.0,122.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="134.0,122.0 156.0,133.0 134.0,144.0 112.0,133.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,133.0 178.0,144.0 156.0,155.0 134.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,144.0 200.0,155.0 178.0,166.0 156.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,155.0 222.0,166.0 200.0,177.0 178.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,166.0 244.0,177.0 222.0,188.0 200.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,177.0 266.0,188.0 244.0,199.0 222.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="266.0,188.0 288.0,199.0 266.0,210.0 244.0,199.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="288.0,199.0 310.0,210.0 288.0,221.0 266.0,210.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="90.0,122.0 112.0,133.0 90.0,144.0 68.0,133.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="112.0,133.0 134.0,144.0 112.0,155.0 90.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="134.0,144.0 156.0,155.0 134.0,166.0 112.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,155.0 178.0,166.0 156.0,177.0 134.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,166.0 200.0,177.0 178.0,188.0 156.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,177.0 222.0,188.0 200.0,199.0 178.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,188.0 244.0,199.0 222.0,210.0 200.0,199.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,199.0 266.0,210.0 244.0,221.0 222.0,210.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="266.0,210.0 288.0,221.0 266.0,232.0 244.0,221.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="68.0,133.0 90.0,144.0 68.0,155.0 46.0,144.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="90.0,144.0 112.0,155.0 90.0,166.0 68.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="112.0,155.0 134.0,166.0 112.0,177.0 90.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="134.0,166.0 156.0,177.0 134.0,188.0 112.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,177.0 178.0,188.0 156.0,199.0 134.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,188.0 200.0,199.0 178.0,210.0 156.0,199.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,199.0 222.0,210.0 200.0,221.0 178.0,210.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,210.0 244.0,221.0 222.0,232.0 200.0,221.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="244.0,221.0 266.0,232.0 244.0,243.0 222.0,232.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="46.0,144.0 68.0,155.0 46.0,166.0 24.0,155.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="68.0,155.0 90.0,166.0 68.0,177.0 46.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="90.0,166.0 112.0,177.0 90.0,188.0 68.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="112.0,177.0 134.0,188.0 112.0,199.0 90.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="134.0,188.0 156.0,199.0 134.0,210.0 112.0,199.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,199.0 178.0,210.0 156.0,221.0 134.0,210.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,210.0 200.0,221.0 178.0,232.0 156.0,221.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,221.0 222.0,232.0 200.0,243.0 178.0,232.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="222.0,232.0 244.0,243.0 222.0,254.0 200.0,243.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="24.0,155.0 46.0,166.0 24.0,177.0 2.0,166.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="46.0,166.0 68.0,177.0 46.0,188.0 24.0,177.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="68.0,177.0 90.0,188.0 68.0,199.0 46.0,188.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="90.0,188.0 112.0,199.0 90.0,210.0 68.0,199.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="112.0,199.0 134.0,210.0 112.0,221.0 90.0,210.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="134.0,210.0 156.0,221.0 134.0,232.0 112.0,221.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="156.0,221.0 178.0,232.0 156.0,243.0 134.0,232.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="178.0,232.0 200.0,243.0 178.0,254.0 156.0,243.0" fill="#79b836" stroke="#6fae33" stroke-width="0.5"/>
+<polygon points="200.0,243.0 222.0,254.0 200.0,265.0 178.0,254.0" fill="#84c63f" stroke="#6fae33" stroke-width="0.5"/>
+<rect x="198" y="64" width="5" height="16" fill="#5d4037"/><polygon points="200,44 186,72 214,72" fill="#2e7d32"/>
+<polygon points="184.6,100.0 200.0,107.7 200.0,97.7 184.6,90.0" fill="#9aa3b2"/><polygon points="200.0,107.7 215.4,100.0 215.4,90.0 200.0,97.7" fill="#7d8693"/><polygon points="200.0,82.3 215.4,90.0 200.0,97.7 184.6,90.0" fill="#cfd6df"/>
+<polygon points="162.6,111.0 178.0,118.7 178.0,108.7 162.6,101.0" fill="#9aa3b2"/><polygon points="178.0,118.7 193.4,111.0 193.4,101.0 178.0,108.7" fill="#7d8693"/><polygon points="178.0,93.3 193.4,101.0 178.0,108.7 162.6,101.0" fill="#cfd6df"/>
+<polygon points="206.6,111.0 222.0,118.7 222.0,108.7 206.6,101.0" fill="#9aa3b2"/><polygon points="222.0,118.7 237.4,111.0 237.4,101.0 222.0,108.7" fill="#7d8693"/><polygon points="222.0,93.3 237.4,101.0 222.0,108.7 206.6,101.0" fill="#cfd6df"/>
+<polygon points="228.6,122.0 244.0,129.7 244.0,119.7 228.6,112.0" fill="#9aa3b2"/><polygon points="244.0,129.7 259.4,122.0 259.4,112.0 244.0,119.7" fill="#7d8693"/><polygon points="244.0,104.3 259.4,112.0 244.0,119.7 228.6,112.0" fill="#cfd6df"/>
+<polygon points="140.6,122.0 156.0,129.7 156.0,119.7 140.6,112.0" fill="#9aa3b2"/><polygon points="156.0,129.7 171.4,122.0 171.4,112.0 156.0,119.7" fill="#7d8693"/><polygon points="156.0,104.3 171.4,112.0 156.0,119.7 140.6,112.0" fill="#cfd6df"/>
+<polygon points="182.4,122.0 200.0,130.8 200.0,116.8 182.4,108.0" fill="#465563"/><polygon points="200.0,130.8 217.6,122.0 217.6,108.0 200.0,116.8" fill="#36424d"/><polygon points="200.0,99.2 217.6,108.0 200.0,116.8 182.4,108.0" fill="#5a6b7d"/>
+<circle cx="200" cy="106" r="7" fill="#2c3540"/><rect x="198" y="96" width="14" height="6" rx="3" fill="#1c2530" transform="rotate(-30 200 102)"/>
+<polygon points="118.6,133.0 134.0,140.7 134.0,130.7 118.6,123.0" fill="#9aa3b2"/><polygon points="134.0,140.7 149.4,133.0 149.4,123.0 134.0,130.7" fill="#7d8693"/><polygon points="134.0,115.3 149.4,123.0 134.0,130.7 118.6,123.0" fill="#cfd6df"/>
+<polygon points="272.6,144.0 288.0,151.7 288.0,141.7 272.6,134.0" fill="#9aa3b2"/><polygon points="288.0,151.7 303.4,144.0 303.4,134.0 288.0,141.7" fill="#7d8693"/><polygon points="288.0,126.3 303.4,134.0 288.0,141.7 272.6,134.0" fill="#cfd6df"/>
+<polygon points="96.6,144.0 112.0,151.7 112.0,141.7 96.6,134.0" fill="#9aa3b2"/><polygon points="112.0,151.7 127.4,144.0 127.4,134.0 112.0,141.7" fill="#7d8693"/><polygon points="112.0,126.3 127.4,134.0 112.0,141.7 96.6,134.0" fill="#cfd6df"/>
+<polygon points="244.0,177.0 266.0,188.0 266.0,164.0 244.0,153.0" fill="#a8cfe4"/><polygon points="266.0,188.0 288.0,177.0 288.0,153.0 266.0,164.0" fill="#86b4cf"/><polygon points="266.0,142.0 288.0,153.0 266.0,164.0 244.0,153.0" fill="#dff1fb"/>
+<text x="266" y="152" font-size="14" text-anchor="middle">🍖</text><rect x="242" y="137" width="48" height="14" rx="7" fill="#0b0f1a" opacity="0.8"/><text x="266" y="148" fill="#9fe0ff" font-size="9" font-weight="800" text-anchor="middle">OMBOR <tspan id="muzLvlYoz">1</tspan></text>
+<polygon points="74.6,155.0 90.0,162.7 90.0,152.7 74.6,145.0" fill="#9aa3b2"/><polygon points="90.0,162.7 105.4,155.0 105.4,145.0 90.0,152.7" fill="#7d8693"/><polygon points="90.0,137.3 105.4,145.0 90.0,152.7 74.6,145.0" fill="#cfd6df"/>
+<polygon points="294.6,155.0 310.0,162.7 310.0,152.7 294.6,145.0" fill="#9aa3b2"/><polygon points="310.0,162.7 325.4,155.0 325.4,145.0 310.0,152.7" fill="#7d8693"/><polygon points="310.0,137.3 325.4,145.0 310.0,152.7 294.6,145.0" fill="#cfd6df"/>
+<polygon points="316.6,166.0 332.0,173.7 332.0,163.7 316.6,156.0" fill="#9aa3b2"/><polygon points="332.0,173.7 347.4,166.0 347.4,156.0 332.0,163.7" fill="#7d8693"/><polygon points="332.0,148.3 347.4,156.0 332.0,163.7 316.6,156.0" fill="#cfd6df"/>
+<polygon points="52.6,166.0 68.0,173.7 68.0,163.7 52.6,156.0" fill="#9aa3b2"/><polygon points="68.0,173.7 83.4,166.0 83.4,156.0 68.0,163.7" fill="#7d8693"/><polygon points="68.0,148.3 83.4,156.0 68.0,163.7 52.6,156.0" fill="#cfd6df"/>
+<polygon points="158.2,166.0 200.0,186.9 200.0,146.9 158.2,126.0" fill="#9aa3b2"/><polygon points="200.0,186.9 241.8,166.0 241.8,126.0 200.0,146.9" fill="#7d8693"/><polygon points="200.0,105.1 241.8,126.0 200.0,146.9 158.2,126.0" fill="#c3cad6"/>
+<polygon points="112.0,166.0 134.0,177.0 134.0,155.0 112.0,144.0" fill="#b08a20"/><polygon points="134.0,177.0 156.0,166.0 156.0,144.0 134.0,155.0" fill="#8a6a14"/><polygon points="134.0,133.0 156.0,144.0 134.0,155.0 112.0,144.0" fill="#d8b04a"/>
+<rect x="22" y="152" width="5" height="16" fill="#5d4037"/><polygon points="24,132 10,160 38,160" fill="#2e7d32"/>
+<rect x="374" y="152" width="5" height="16" fill="#5d4037"/><polygon points="376,132 362,160 390,160" fill="#2e7d32"/>
+<polygon points="158,126 200,92 242,126" fill="#b5532e"/><polygon points="158,126 200,92 200,126" fill="#9a4226"/><line x1="200" y1="92" x2="200" y2="74" stroke="#5d4037" stroke-width="3"/><polygon points="200,76 222,82 200,88" fill="#ffce54"/><rect x="170" y="108" width="60" height="16" rx="8" fill="#0b0f1a" opacity="0.8"/><text x="200" y="120" fill="#ffce54" font-size="11" font-weight="800" text-anchor="middle">QASR <tspan id="uyLvlYoz">1</tspan></text>
+<text x="134" y="142" font-size="14" text-anchor="middle">🪵</text>
+<polygon points="74.6,177.0 90.0,184.7 90.0,174.7 74.6,167.0" fill="#9aa3b2"/><polygon points="90.0,184.7 105.4,177.0 105.4,167.0 90.0,174.7" fill="#7d8693"/><polygon points="90.0,159.3 105.4,167.0 90.0,174.7 74.6,167.0" fill="#cfd6df"/>
+<polygon points="294.6,177.0 310.0,184.7 310.0,174.7 294.6,167.0" fill="#9aa3b2"/><polygon points="310.0,184.7 325.4,177.0 325.4,167.0 310.0,174.7" fill="#7d8693"/><polygon points="310.0,159.3 325.4,167.0 310.0,174.7 294.6,167.0" fill="#cfd6df"/>
+<polygon points="96.6,188.0 112.0,195.7 112.0,185.7 96.6,178.0" fill="#9aa3b2"/><polygon points="112.0,195.7 127.4,188.0 127.4,178.0 112.0,185.7" fill="#7d8693"/><polygon points="112.0,170.3 127.4,178.0 112.0,185.7 96.6,178.0" fill="#cfd6df"/>
+<polygon points="272.6,188.0 288.0,195.7 288.0,185.7 272.6,178.0" fill="#9aa3b2"/><polygon points="288.0,195.7 303.4,188.0 303.4,178.0 288.0,185.7" fill="#7d8693"/><polygon points="288.0,170.3 303.4,178.0 288.0,185.7 272.6,178.0" fill="#cfd6df"/>
+<polygon points="250.6,199.0 266.0,206.7 266.0,196.7 250.6,189.0" fill="#9aa3b2"/><polygon points="266.0,206.7 281.4,199.0 281.4,189.0 266.0,196.7" fill="#7d8693"/><polygon points="266.0,181.3 281.4,189.0 266.0,196.7 250.6,189.0" fill="#cfd6df"/>
+<polygon points="162.6,199.0 178.0,206.7 178.0,176.7 162.6,169.0" fill="#6d5345"/><polygon points="178.0,206.7 193.4,199.0 193.4,169.0 178.0,176.7" fill="#553f33"/><polygon points="178.0,161.3 193.4,169.0 178.0,176.7 162.6,169.0" fill="#8d6e63"/>
+<polygon points="160,169 178,153 196,169" fill="#5d4037"/>
+<polygon points="140.6,210.0 156.0,217.7 156.0,207.7 140.6,200.0" fill="#9aa3b2"/><polygon points="156.0,217.7 171.4,210.0 171.4,200.0 156.0,207.7" fill="#7d8693"/><polygon points="156.0,192.3 171.4,200.0 156.0,207.7 140.6,200.0" fill="#cfd6df"/>
+<polygon points="228.6,210.0 244.0,217.7 244.0,207.7 228.6,200.0" fill="#9aa3b2"/><polygon points="244.0,217.7 259.4,210.0 259.4,200.0 244.0,207.7" fill="#7d8693"/><polygon points="244.0,192.3 259.4,200.0 244.0,207.7 228.6,200.0" fill="#cfd6df"/>
+<polygon points="182.4,210.0 200.0,218.8 200.0,204.8 182.4,196.0" fill="#465563"/><polygon points="200.0,218.8 217.6,210.0 217.6,196.0 200.0,204.8" fill="#36424d"/><polygon points="200.0,187.2 217.6,196.0 200.0,204.8 182.4,196.0" fill="#5a6b7d"/>
+<circle cx="200" cy="194" r="7" fill="#2c3540"/><rect x="198" y="184" width="14" height="6" rx="3" fill="#1c2530" transform="rotate(-30 200 190)"/>
+<polygon points="162.6,221.0 178.0,228.7 178.0,218.7 162.6,211.0" fill="#9aa3b2"/><polygon points="178.0,228.7 193.4,221.0 193.4,211.0 178.0,218.7" fill="#7d8693"/><polygon points="178.0,203.3 193.4,211.0 178.0,218.7 162.6,211.0" fill="#cfd6df"/>
+<polygon points="206.6,221.0 222.0,228.7 222.0,218.7 206.6,211.0" fill="#9aa3b2"/><polygon points="222.0,228.7 237.4,221.0 237.4,211.0 222.0,218.7" fill="#7d8693"/><polygon points="222.0,203.3 237.4,211.0 222.0,218.7 206.6,211.0" fill="#cfd6df"/>
+<polygon points="184.6,232.0 200.0,239.7 200.0,229.7 184.6,222.0" fill="#9aa3b2"/><polygon points="200.0,239.7 215.4,232.0 215.4,222.0 200.0,229.7" fill="#7d8693"/><polygon points="200.0,214.3 215.4,222.0 200.0,229.7 184.6,222.0" fill="#cfd6df"/>
+<g id="drakonArt" transform="translate(26,96) scale(0.95)"></g>
+<rect x="61" y="212" width="120" height="20" rx="10" fill="#0b0f1a" opacity="0.8"/><text id="drakonNom" x="121" y="226" fill="#ffce54" font-size="11" font-weight="800" text-anchor="middle">Drakon yo'q</text>
+</svg>
+</div>
+<div class="panel">
+  <button class="btn green" id="tuxumTugma">🥚 Tuxum olish<small>100 💰</small></button>
+  <button class="btn gold" id="boqishTugma">🍖 Drakonni boqish<small>50 🍖</small></button>
+  <button class="btn" id="uyTugma">🏰 Qasrni yaxshilash<small id="uyNarxYoz"></small></button>
+  <button class="btn" id="ormonTugma">🌲 O'rmon<small id="ormonNarxYoz"></small></button>
+  <button class="btn" id="muzTugma">❄️ Omborni yaxshilash<small id="muzNarxYoz"></small></button>
+  <button class="btn" id="devorTugma">🧱 Devorni yaxshilash<small id="devorNarxYoz"></small></button>
+  <button class="btn red" id="hujumTugma">⚔️ Dushman hujumini sinash</button>
+</div>
+<script>
+let oyin={yogoch:50,gosht:50,pul:150,uyLvl:1,ormonLvl:1,muzLvl:1,devorLvl:1,drakonHolat:"yoq",drakonLvl:0,tuxumOchilishVaqti:0,kasalTugashVaqti:0};
+const E=(id)=>document.getElementById(id);
+let xt;function xabar(m){const x=E("xabar");x.textContent=m;x.classList.add("kor");clearTimeout(xt);xt=setTimeout(()=>x.classList.remove("kor"),2400);}
+const uyNarx=()=>oyin.uyLvl*100,ormonNarx=()=>oyin.ormonLvl*40,muzNarx=()=>oyin.muzLvl*60,devorNarx=()=>oyin.devorLvl*50,goshtSigim=()=>oyin.muzLvl*100;
+const drakonKuchi=()=>oyin.drakonHolat==="tirik"?oyin.drakonLvl*20:0;
+const devorKuchi=()=>oyin.devorLvl*15;
 
-  <!-- ===== HUD ===== -->
-  <div class="hud">
-    <div class="chip yog"><span class="ico">🪵</span><span class="val"><small>Yog'och</small><b id="yogochYoz">0</b></span></div>
-    <div class="chip gos"><span class="ico">🍖</span><span class="val"><small>Go'sht</small><b id="goshtYoz">0</b></span></div>
-    <div class="chip pul"><span class="ico">💰</span><span class="val"><small>Pul</small><b id="pulYoz">0</b></span></div>
-  </div>
+function tuxumSvg(){return '<g transform="translate(135,60)"><ellipse cx="40" cy="60" rx="26" ry="8" fill="#000" opacity=".25"/><ellipse cx="40" cy="24" rx="22" ry="30" fill="#f3e3bf" stroke="#cbb98a" stroke-width="2"/><circle cx="32" cy="14" r="4" fill="#d8c79a"/><circle cx="50" cy="26" r="5" fill="#d8c79a"/><path d="M30 4 l6 8 l-5 6 l8 4" fill="none" stroke="#b09a63" stroke-width="1.5"/></g>';}
+function bolaSvg(){return '<g transform="translate(120,40)"><ellipse cx="50" cy="78" rx="34" ry="8" fill="#000" opacity=".25"/><ellipse cx="50" cy="55" rx="26" ry="22" fill="#e0522a"/><circle cx="50" cy="30" r="18" fill="#e0522a"/><polygon points="40,16 46,2 52,16" fill="#8e2412"/><polygon points="60,16 54,2 50,16" fill="#8e2412"/><circle cx="44" cy="28" r="4" fill="#fff"/><circle cx="45" cy="29" r="2" fill="#000"/><circle cx="56" cy="28" r="4" fill="#fff"/><circle cx="55" cy="29" r="2" fill="#000"/><ellipse cx="50" cy="38" rx="8" ry="5" fill="#ffb98a"/><path d="M26 52 q-16 -6 -12 12 q12 -4 14 2 Z" fill="#b8331a"/><path d="M74 52 q16 -6 12 12 q-12 -4 -14 2 Z" fill="#b8331a"/></g>';}
+function kattaSvg(){return '<g transform="translate(70,30)"><ellipse cx="90" cy="118" rx="64" ry="11" fill="#000" opacity=".3"/><path d="M70 60 C16 24 -6 52 8 94 C30 70 52 78 66 86 Z" fill="#b8331a"/><path d="M110 60 C164 24 186 52 172 94 C150 70 128 78 114 86 Z" fill="#b8331a"/><path d="M90 110 q40 30 80 10 q-30 -6 -46 -28" fill="#d8442a"/><ellipse cx="68" cy="116" rx="12" ry="9" fill="#a82c16"/><ellipse cx="112" cy="116" rx="12" ry="9" fill="#a82c16"/><ellipse cx="90" cy="90" rx="40" ry="32" fill="#e0522a"/><path d="M62 90 q28 24 56 0 q-8 20 -28 22 q-20 -2 -28 -22" fill="#ffcaa0"/><path d="M78 62 C72 36 92 22 104 22 C120 22 120 44 108 56 Z" fill="#e0522a"/><ellipse cx="112" cy="34" rx="22" ry="18" fill="#e0522a"/><polygon points="100,18 96,-2 108,14" fill="#e9dcc0"/><polygon points="118,16 124,-4 128,14" fill="#e9dcc0"/><ellipse cx="112" cy="32" rx="5" ry="6" fill="#fff"/><circle cx="113" cy="33" r="3" fill="#111"/><polygon points="130,40 134,48 126,46" fill="#fff"/><path d="M70 64 l6 -10 l6 10 M82 60 l6 -12 l6 12 M94 60 l6 -10 l6 10" fill="#8e2412"/></g>';}
 
-  <!-- ===== SAHNA (hammasi SVG bilan chizilgan) ===== -->
-  <div class="sahna">
-    <div class="xabar" id="xabar"></div>
-
-    <svg viewBox="0 0 400 470" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <linearGradient id="osmon" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#1e3a5f"/><stop offset=".5" stop-color="#3d6fa5"/>
-          <stop offset=".8" stop-color="#7eb6d9"/><stop offset="1" stop-color="#f3c98b"/>
-        </linearGradient>
-        <linearGradient id="yer" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#6fae3e"/><stop offset="1" stop-color="#3c6b22"/>
-        </linearGradient>
-        <linearGradient id="tosh" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#b8c0cc"/><stop offset="1" stop-color="#7d8593"/>
-        </linearGradient>
-        <linearGradient id="toshTomon" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#9aa3b2"/><stop offset="1" stop-color="#6a7280"/>
-        </linearGradient>
-        <linearGradient id="drBody" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#ff7a3d"/><stop offset="1" stop-color="#c8341a"/>
-        </linearGradient>
-        <linearGradient id="drQanot" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#e0522a"/><stop offset="1" stop-color="#8e2412"/>
-        </linearGradient>
-        <radialGradient id="quyosh" cx=".5" cy=".5" r=".5">
-          <stop offset="0" stop-color="#fff6c8"/><stop offset="1" stop-color="#ffd34a" stop-opacity="0"/>
-        </radialGradient>
-        <filter id="soya" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".35"/>
-        </filter>
-      </defs>
-
-      <!-- OSMON -->
-      <rect x="0" y="0" width="400" height="320" fill="url(#osmon)"/>
-      <circle cx="320" cy="80" r="60" fill="url(#quyosh)"/>
-      <circle cx="320" cy="80" r="26" fill="#fff6c8"/>
-      <!-- bulutlar -->
-      <g fill="#ffffff" opacity=".85">
-        <ellipse cx="90" cy="70" rx="38" ry="16"/><ellipse cx="120" cy="62" rx="28" ry="14"/>
-        <ellipse cx="250" cy="45" rx="30" ry="12"/><ellipse cx="225" cy="50" rx="20" ry="10"/>
-      </g>
-      <!-- uzoq tepaliklar -->
-      <ellipse cx="80" cy="330" rx="160" ry="70" fill="#3f7a4a" opacity=".7"/>
-      <ellipse cx="340" cy="335" rx="150" ry="65" fill="#356b40" opacity=".7"/>
-
-      <!-- YER -->
-      <rect x="0" y="300" width="400" height="170" fill="url(#yer)"/>
-      <!-- yo'l -->
-      <path d="M150 470 Q200 390 200 330 Q200 390 250 470 Z" fill="#caa56b" opacity=".55"/>
-
-      <!-- O'RMON (chap) -->
-      <g filter="url(#soya)">
-        <g transform="translate(8,250)">
-          <rect x="20" y="48" width="9" height="30" fill="#5d4037"/><polygon points="24,4 0,54 49,54" fill="#2e7d32"/><polygon points="24,18 6,58 42,58" fill="#3a9540"/>
-          <rect x="52" y="60" width="8" height="26" fill="#5d4037"/><polygon points="56,24 36,66 76,66" fill="#256e2a"/>
-          <rect x="2" y="78" width="8" height="24" fill="#5d4037"/><polygon points="6,44 -12,86 24,86" fill="#327a36"/>
-        </g>
-      </g>
-      <text x="40" y="372" fill="#fff" font-size="12" font-weight="700" text-anchor="middle" filter="url(#soya)">O'rmon</text>
-
-      <!-- ===== QASR (asosiy uy) ===== -->
-      <g class="bino" id="qasrBino" filter="url(#soya)">
-        <!-- chap minora -->
-        <rect x="118" y="150" width="34" height="115" fill="url(#tosh)"/>
-        <rect x="116" y="142" width="38" height="12" fill="url(#toshTomon)"/>
-        <rect x="116" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="132" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="148" y="138" width="6" height="8" fill="#9aa3b2"/>
-        <!-- o'ng minora -->
-        <rect x="248" y="150" width="34" height="115" fill="url(#tosh)"/>
-        <rect x="246" y="142" width="38" height="12" fill="url(#toshTomon)"/>
-        <rect x="246" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="262" y="138" width="8" height="8" fill="#9aa3b2"/><rect x="278" y="138" width="6" height="8" fill="#9aa3b2"/>
-        <!-- markaziy bino -->
-        <rect x="150" y="175" width="100" height="90" fill="url(#tosh)"/>
-        <rect x="148" y="168" width="104" height="10" fill="url(#toshTomon)"/>
-        <!-- katta tom (uchburchak) -->
-        <polygon points="135,150 200,100 265,150" fill="#b5532e"/>
-        <polygon points="135,150 200,100 200,150" fill="#9a4226"/>
-        <!-- bayroq -->
-        <line x1="200" y1="100" x2="200" y2="72" stroke="#5d4037" stroke-width="3"/>
-        <polygon points="200,74 226,82 200,90" fill="#ffce54"/>
-        <!-- darvoza -->
-        <path d="M180 265 V215 a20 20 0 0 1 40 0 V265 Z" fill="#5d4037"/>
-        <path d="M186 265 V216 a14 14 0 0 1 28 0 V265 Z" fill="#7a5640"/>
-        <line x1="200" y1="202" x2="200" y2="265" stroke="#4a3528" stroke-width="2"/>
-        <!-- derazalar -->
-        <rect x="128" y="175" width="14" height="22" rx="7" fill="#2a3a55"/>
-        <rect x="258" y="175" width="14" height="22" rx="7" fill="#2a3a55"/>
-        <!-- daraja yorlig'i -->
-        <rect x="172" y="120" width="56" height="20" rx="10" fill="#0b0f1a" opacity=".75"/>
-        <text x="200" y="134" fill="#ffce54" font-size="12" font-weight="800" text-anchor="middle">QASR <tspan id="uyLvlYoz">1</tspan>-dr</text>
-      </g>
-
-      <!-- ===== DEVOR (chap) ===== -->
-      <g class="bino" id="devorBino" filter="url(#soya)">
-        <rect x="30" y="318" width="90" height="40" fill="url(#tosh)"/>
-        <!-- tishlar -->
-        <rect x="30" y="310" width="14" height="10" fill="#9aa3b2"/><rect x="56" y="310" width="14" height="10" fill="#9aa3b2"/>
-        <rect x="82" y="310" width="14" height="10" fill="#9aa3b2"/><rect x="106" y="310" width="14" height="10" fill="#9aa3b2"/>
-        <!-- g'isht chiziqlari -->
-        <line x1="30" y1="335" x2="120" y2="335" stroke="#6a7280" stroke-width="1.5"/>
-        <line x1="60" y1="318" x2="60" y2="335" stroke="#6a7280" stroke-width="1.5"/>
-        <line x1="90" y1="335" x2="90" y2="358" stroke="#6a7280" stroke-width="1.5"/>
-        <text x="75" y="350" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">Devor <tspan id="devorLvlYoz">1</tspan></text>
-      </g>
-
-      <!-- ===== GO'SHT OMBORI (sovuq ombor - boshqacha) ===== -->
-      <g class="bino" id="muzBino" filter="url(#soya)">
-        <!-- tana -->
-        <rect x="300" y="270" width="74" height="78" rx="6" fill="#5a6b7d"/>
-        <rect x="300" y="270" width="74" height="78" rx="6" fill="url(#toshTomon)" opacity=".4"/>
-        <!-- muz tomi -->
-        <polygon points="294,272 337,238 380,272" fill="#dff1fb"/>
-        <polygon points="294,272 337,238 337,272" fill="#bfe2f4"/>
-        <!-- muz tomchilari -->
-        <path d="M300 272 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0 q4 8 8 0" fill="#dff1fb"/>
-        <!-- eshik -->
-        <rect x="320" y="298" width="34" height="50" rx="4" fill="#3a4a5c"/>
-        <circle cx="348" cy="324" r="3" fill="#cdd8e4"/>
-        <!-- go'sht belgisi -->
-        <text x="337" y="294" font-size="18" text-anchor="middle">🍖</text>
-        <rect x="306" y="252" width="62" height="18" rx="9" fill="#0b0f1a" opacity=".75"/>
-        <text x="337" y="265" fill="#9fe0ff" font-size="10.5" font-weight="800" text-anchor="middle">OMBOR <tspan id="muzLvlYoz">1</tspan></text>
-      </g>
-
-      <!-- ===== DRAKON (JS bu yerga chizadi) ===== -->
-      <g id="drakonArt" transform="translate(5,298)"></g>
-      <g class="bino" id="drakonObyekt" transform="translate(200,432)">
-        <rect x="-62" y="-14" width="124" height="22" rx="11" fill="#0b0f1a" opacity=".8"/>
-        <text id="drakonNom" x="0" y="2" fill="#ffce54" font-size="12" font-weight="800" text-anchor="middle">Drakon yo'q</text>
-      </g>
-    </svg>
-  </div>
-
-  <!-- ===== TUGMALAR ===== -->
-  <div class="panel">
-    <button class="btn green" id="tuxumTugma">🥚 Tuxum olish<small>100 💰</small></button>
-    <button class="btn gold" id="boqishTugma">🍖 Drakonni boqish<small>50 🍖</small></button>
-    <button class="btn" id="uyTugma">🏰 Qasrni yaxshilash<small id="uyNarxYoz"></small></button>
-    <button class="btn" id="ormonTugma">🌲 O'rmon<small id="ormonNarxYoz"></small></button>
-    <button class="btn" id="muzTugma">❄️ Omborni yaxshilash<small id="muzNarxYoz"></small></button>
-    <button class="btn" id="devorTugma">🧱 Devorni yaxshilash<small id="devorNarxYoz"></small></button>
-    <button class="btn red" id="hujumTugma">⚔️ Dushman hujumini sinash</button>
-  </div>
-
-  <!-- ===================== O'YIN MIYASI ===================== -->
-  <script>
-  /* 1) XOTIRA */
-  let oyin = {
-    yogoch:50, gosht:50, pul:150,
-    uyLvl:1, ormonLvl:1, muzLvl:1, devorLvl:1,
-    drakonHolat:"yoq", drakonLvl:0, tuxumOchilishVaqti:0, kasalTugashVaqti:0
-  };
-  const E=(id)=>document.getElementById(id);
-
-  /* 2) XABAR */
-  let xt;
-  function xabar(m){const x=E("xabar");x.textContent=m;x.classList.add("kor");
-    clearTimeout(xt);xt=setTimeout(()=>x.classList.remove("kor"),2400);}
-
-  /* 3) NARXLAR */
-  const uyNarx=()=>oyin.uyLvl*100, ormonNarx=()=>oyin.ormonLvl*40,
-        muzNarx=()=>oyin.muzLvl*60, devorNarx=()=>oyin.devorLvl*50,
-        goshtSigim=()=>oyin.muzLvl*100;
-  const drakonKuchi=()=>oyin.drakonHolat==="tirik"?oyin.drakonLvl*20:0;
-  const devorKuchi=()=>oyin.devorLvl*15;
-
-  /* 4) DRAKON RASMLARI (SVG) - holatga qarab almashadi */
-  function tuxumSvg(){return `
-    <g transform="translate(178,92)">
-      <ellipse cx="0" cy="42" rx="34" ry="9" fill="#000" opacity=".25"/>
-      <ellipse cx="0" cy="0" rx="26" ry="34" fill="#f3e3bf" stroke="#cbb98a" stroke-width="2"/>
-      <circle cx="-9" cy="-12" r="4" fill="#d8c79a"/><circle cx="10" cy="2" r="5" fill="#d8c79a"/><circle cx="-4" cy="14" r="3" fill="#d8c79a"/>
-      <path d="M-10 -20 l6 8 l-5 6 l8 4" fill="none" stroke="#b09a63" stroke-width="1.5"/>
-    </g>`;}
-  function bolaSvg(){return `
-    <g transform="translate(150,70)">
-      <ellipse cx="50" cy="78" rx="40" ry="9" fill="#000" opacity=".25"/>
-      <ellipse cx="50" cy="55" rx="28" ry="24" fill="url(#drBody)"/>
-      <circle cx="50" cy="28" r="20" fill="url(#drBody)"/>
-      <polygon points="38,12 44,-2 50,12" fill="#8e2412"/><polygon points="62,12 56,-2 50,12" fill="#8e2412"/>
-      <circle cx="43" cy="26" r="4" fill="#fff"/><circle cx="44" cy="27" r="2" fill="#000"/>
-      <circle cx="57" cy="26" r="4" fill="#fff"/><circle cx="56" cy="27" r="2" fill="#000"/>
-      <ellipse cx="50" cy="38" rx="10" ry="6" fill="#ffb98a"/>
-      <path d="M24 50 q-18 -6 -14 14 q14 -4 16 2 Z" fill="url(#drQanot)"/>
-      <path d="M76 50 q18 -6 14 14 q-14 -4 -16 2 Z" fill="url(#drQanot)"/>
-    </g>`;}
-  function kattaSvg(){return `
-    <g transform="translate(110,30)">
-      <ellipse cx="90" cy="118" rx="70" ry="12" fill="#000" opacity=".3"/>
-      <!-- qanotlar -->
-      <path d="M70 60 C10 20 -10 50 6 96 C30 70 52 78 66 86 Z" fill="url(#drQanot)" stroke="#7a1e0f" stroke-width="2"/>
-      <path d="M110 60 C170 20 190 50 174 96 C150 70 128 78 114 86 Z" fill="url(#drQanot)" stroke="#7a1e0f" stroke-width="2"/>
-      <path d="M14 88 L6 96 M40 76 L36 92 M64 80 L62 94" stroke="#7a1e0f" stroke-width="1.5" fill="none"/>
-      <path d="M166 88 L174 96 M140 76 L144 92 M116 80 L118 94" stroke="#7a1e0f" stroke-width="1.5" fill="none"/>
-      <!-- dum -->
-      <path d="M90 110 q40 30 80 10 q-30 -6 -46 -28" fill="url(#drBody)"/>
-      <polygon points="168,118 184,112 172,126" fill="#8e2412"/>
-      <!-- oyoqlar -->
-      <ellipse cx="68" cy="118" rx="13" ry="10" fill="#a82c16"/>
-      <ellipse cx="112" cy="118" rx="13" ry="10" fill="#a82c16"/>
-      <path d="M58 124 l4 6 M68 126 l0 7 M78 124 l-3 6" stroke="#5a160a" stroke-width="2"/>
-      <path d="M102 124 l4 6 M112 126 l0 7 M122 124 l-3 6" stroke="#5a160a" stroke-width="2"/>
-      <!-- tana -->
-      <ellipse cx="90" cy="92" rx="42" ry="34" fill="url(#drBody)"/>
-      <path d="M62 92 q28 26 56 0 q-8 22 -28 24 q-20 -2 -28 -24" fill="#ffcaa0"/>
-      <!-- bo'yin va bosh -->
-      <path d="M78 64 C72 36 92 22 104 22 C120 22 120 44 108 58 Z" fill="url(#drBody)"/>
-      <ellipse cx="112" cy="34" rx="24" ry="20" fill="url(#drBody)"/>
-      <path d="M122 30 q22 -2 26 8 q-16 4 -24 -2 Z" fill="#c8341a"/>
-      <!-- shoxlar -->
-      <polygon points="100,16 96,-4 108,12" fill="#e9dcc0"/><polygon points="118,16 124,-4 128,14" fill="#e9dcc0"/>
-      <!-- ko'z -->
-      <ellipse cx="110" cy="30" rx="6" ry="7" fill="#fff"/><circle cx="111" cy="31" r="3" fill="#1a1a1a"/>
-      <!-- tishlar -->
-      <polygon points="132,40 136,48 128,46" fill="#fff"/><polygon points="124,42 127,50 119,47" fill="#fff"/>
-      <!-- belgisi (orqa tikon) -->
-      <path d="M70 64 l6 -10 l6 10 M82 60 l6 -12 l6 12 M94 60 l6 -10 l6 10" fill="#8e2412"/>
-    </g>`;}
-
-  /* 5) EKRANNI YANGILASH */
-  function yangila(){
-    E("yogochYoz").textContent=Math.floor(oyin.yogoch);
-    E("goshtYoz").textContent=Math.floor(oyin.gosht)+"/"+goshtSigim();
-    E("pulYoz").textContent=Math.floor(oyin.pul);
-    E("uyLvlYoz").textContent=oyin.uyLvl;
-    E("muzLvlYoz").textContent=oyin.muzLvl;
-    E("devorLvlYoz").textContent=oyin.devorLvl;
-    E("uyNarxYoz").textContent=uyNarx()+" 💰";
-    E("ormonNarxYoz").textContent=ormonNarx()+" 💰";
-    E("muzNarxYoz").textContent=muzNarx()+" 🪵";
-    E("devorNarxYoz").textContent=devorNarx()+" 🪵";
-
-    // DRAKON
-    const art=E("drakonArt"); art.classList.remove("kasal");
-    if(oyin.drakonHolat==="yoq"){art.innerHTML="";E("drakonNom").textContent="Drakon yo'q (tuxum oling)";}
-    else if(oyin.drakonHolat==="tuxum"){art.innerHTML=tuxumSvg();
-      const q=Math.ceil((oyin.tuxumOchilishVaqti-Date.now())/1000);
-      E("drakonNom").textContent="🥚 Ochilmoqda: "+q+"s";}
-    else if(oyin.drakonHolat==="tirik"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();
-      E("drakonNom").textContent="🐉 Drakon "+oyin.drakonLvl+"-dr · kuch "+drakonKuchi();}
-    else if(oyin.drakonHolat==="kasal"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();art.classList.add("kasal");
-      const q=Math.ceil((oyin.kasalTugashVaqti-Date.now())/1000);
-      E("drakonNom").textContent="🤒 Kasal: "+q+"s";}
-
-    E("tuxumTugma").disabled=(oyin.drakonHolat!=="yoq")||(oyin.pul<100);
-    E("boqishTugma").disabled=(oyin.drakonHolat!=="tirik")||(oyin.gosht<50);
-    E("uyTugma").disabled=oyin.pul<uyNarx();
-    E("ormonTugma").disabled=oyin.pul<ormonNarx();
-    E("muzTugma").disabled=oyin.yogoch<muzNarx();
-    E("devorTugma").disabled=oyin.yogoch<devorNarx();
-  }
-
-  /* 6) TUGMALAR */
-  E("tuxumTugma").onclick=()=>{oyin.pul-=100;oyin.drakonHolat="tuxum";oyin.drakonLvl=1;
-    oyin.tuxumOchilishVaqti=Date.now()+30000;xabar("🥚 Tuxum olindi! 30s da ochiladi.");yangila();saqla();};
-  E("boqishTugma").onclick=()=>{oyin.gosht-=50;oyin.drakonLvl++;
-    xabar("🍖 Drakon o'sdi! "+oyin.drakonLvl+"-daraja.");yangila();saqla();};
-  E("uyTugma").onclick=()=>{oyin.pul-=uyNarx();oyin.uyLvl++;xabar("🏰 Qasr yaxshilandi!");yangila();saqla();};
-  E("ormonTugma").onclick=()=>{oyin.pul-=ormonNarx();oyin.ormonLvl++;xabar("🌲 O'rmon yaxshilandi!");yangila();saqla();};
-  E("muzTugma").onclick=()=>{oyin.yogoch-=muzNarx();oyin.muzLvl++;xabar("❄️ Ombor kengaydi!");yangila();saqla();};
-  E("devorTugma").onclick=()=>{oyin.yogoch-=devorNarx();oyin.devorLvl++;xabar("🧱 Devor mustahkamlandi!");yangila();saqla();};
-  E("hujumTugma").onclick=()=>dushmanHujumi();
-
-  // qasrni bossa ham yaxshilanadi (qulaylik uchun)
-  E("qasrBino").onclick=()=>{if(!E("uyTugma").disabled)E("uyTugma").onclick();};
-  E("devorBino").onclick=()=>{if(!E("devorTugma").disabled)E("devorTugma").onclick();};
-  E("muzBino").onclick=()=>{if(!E("muzTugma").disabled)E("muzTugma").onclick();};
-
-  /* 7) DUSHMAN HUJUMI */
-  function dushmanHujumi(){
-    const dushman=30+Math.floor(Math.random()*(oyin.uyLvl*40));
-    const himoya=drakonKuchi()+devorKuchi();
-    xabar("⚔️ Dushman keldi! Kuch "+dushman+" | Himoya "+himoya);
-    setTimeout(()=>{
-      if(himoya>=dushman){
-        const m=30+Math.floor(Math.random()*50);oyin.pul+=m;
-        xabar("🛡️ G'ALABA! Dushman qaytdi. +"+m+" 💰");
-      }else{
-        const o=Math.floor(oyin.gosht*0.5);oyin.gosht-=o;
-        if(oyin.drakonHolat==="tirik"){
-          const s=oyin.drakonLvl*15;oyin.drakonHolat="kasal";oyin.kasalTugashVaqti=Date.now()+s*1000;
-          xabar("💔 MAG'LUBIYAT! "+o+"🍖 o'g'irlandi. Drakon "+s+"s kasal!");
-        }else xabar("💔 MAG'LUBIYAT! Dushman "+o+"🍖 o'g'irladi!");
-      }
-      yangila();saqla();
-    },700);
-  }
-
-  /* 8) VAQT G'ILDIRAGI */
-  setInterval(()=>{
-    oyin.yogoch+=oyin.ormonLvl;
-    if(oyin.gosht<goshtSigim()){oyin.gosht+=oyin.muzLvl;if(oyin.gosht>goshtSigim())oyin.gosht=goshtSigim();}
-    if(oyin.drakonHolat==="tuxum"&&Date.now()>=oyin.tuxumOchilishVaqti){oyin.drakonHolat="tirik";xabar("🎉 Tuxum ochildi! Drakon tug'ildi!");}
-    if(oyin.drakonHolat==="kasal"&&Date.now()>=oyin.kasalTugashVaqti){oyin.drakonHolat="tirik";xabar("💚 Drakon sog'aydi!");}
-    yangila();
-  },1000);
-
-  /* 9) SAQLASH/YUKLASH */
-  function saqla(){localStorage.setItem("drakonQasri",JSON.stringify(oyin));}
-  function yukla(){const s=localStorage.getItem("drakonQasri");if(s)oyin=JSON.parse(s);}
-
-  yukla();yangila();
-  </script>
+function yangila(){
+  E("yogochYoz").textContent=Math.floor(oyin.yogoch);
+  E("goshtYoz").textContent=Math.floor(oyin.gosht)+"/"+goshtSigim();
+  E("pulYoz").textContent=Math.floor(oyin.pul);
+  E("uyLvlYoz").textContent=oyin.uyLvl;E("muzLvlYoz").textContent=oyin.muzLvl;
+  E("uyNarxYoz").textContent=uyNarx()+" 💰";E("ormonNarxYoz").textContent=ormonNarx()+" 💰";
+  E("muzNarxYoz").textContent=muzNarx()+" 🪵";E("devorNarxYoz").textContent=devorNarx()+" 🪵";
+  const art=E("drakonArt");art.classList.remove("kasal");
+  if(oyin.drakonHolat==="yoq"){art.innerHTML="";E("drakonNom").textContent="Drakon yo'q (tuxum oling)";}
+  else if(oyin.drakonHolat==="tuxum"){art.innerHTML=tuxumSvg();const q=Math.ceil((oyin.tuxumOchilishVaqti-Date.now())/1000);E("drakonNom").textContent="🥚 Ochilmoqda: "+q+"s";}
+  else if(oyin.drakonHolat==="tirik"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();E("drakonNom").textContent="🐉 Drakon "+oyin.drakonLvl+"-dr · kuch "+drakonKuchi();}
+  else if(oyin.drakonHolat==="kasal"){art.innerHTML=oyin.drakonLvl<3?bolaSvg():kattaSvg();art.classList.add("kasal");const q=Math.ceil((oyin.kasalTugashVaqti-Date.now())/1000);E("drakonNom").textContent="🤒 Kasal: "+q+"s";}
+  E("tuxumTugma").disabled=(oyin.drakonHolat!=="yoq")||(oyin.pul<100);
+  E("boqishTugma").disabled=(oyin.drakonHolat!=="tirik")||(oyin.gosht<50);
+  E("uyTugma").disabled=oyin.pul<uyNarx();E("ormonTugma").disabled=oyin.pul<ormonNarx();
+  E("muzTugma").disabled=oyin.yogoch<muzNarx();E("devorTugma").disabled=oyin.yogoch<devorNarx();
+}
+E("tuxumTugma").onclick=()=>{oyin.pul-=100;oyin.drakonHolat="tuxum";oyin.drakonLvl=1;oyin.tuxumOchilishVaqti=Date.now()+30000;xabar("🥚 Tuxum olindi! 30s da ochiladi.");yangila();saqla();};
+E("boqishTugma").onclick=()=>{oyin.gosht-=50;oyin.drakonLvl++;xabar("🍖 Drakon o'sdi! "+oyin.drakonLvl+"-daraja.");yangila();saqla();};
+E("uyTugma").onclick=()=>{oyin.pul-=uyNarx();oyin.uyLvl++;xabar("🏰 Qasr yaxshilandi!");yangila();saqla();};
+E("ormonTugma").onclick=()=>{oyin.pul-=ormonNarx();oyin.ormonLvl++;xabar("🌲 O'rmon yaxshilandi!");yangila();saqla();};
+E("muzTugma").onclick=()=>{oyin.yogoch-=muzNarx();oyin.muzLvl++;xabar("❄️ Ombor kengaydi!");yangila();saqla();};
+E("devorTugma").onclick=()=>{oyin.yogoch-=devorNarx();oyin.devorLvl++;xabar("🧱 Devor mustahkamlandi!");yangila();saqla();};
+E("hujumTugma").onclick=()=>dushmanHujumi();
+function dushmanHujumi(){
+  const dushman=30+Math.floor(Math.random()*(oyin.uyLvl*40));const himoya=drakonKuchi()+devorKuchi();
+  xabar("⚔️ Dushman keldi! Kuch "+dushman+" | Himoya "+himoya);
+  setTimeout(()=>{
+    if(himoya>=dushman){const m=30+Math.floor(Math.random()*50);oyin.pul+=m;xabar("🛡️ G'ALABA! +"+m+" 💰");}
+    else{const o=Math.floor(oyin.gosht*0.5);oyin.gosht-=o;
+      if(oyin.drakonHolat==="tirik"){const s=oyin.drakonLvl*15;oyin.drakonHolat="kasal";oyin.kasalTugashVaqti=Date.now()+s*1000;xabar("💔 MAG'LUBIYAT! "+o+"🍖 o'g'irlandi. Drakon "+s+"s kasal!");}
+      else xabar("💔 MAG'LUBIYAT! "+o+"🍖 o'g'irlandi!");}
+    yangila();saqla();
+  },700);
+}
+setInterval(()=>{
+  oyin.yogoch+=oyin.ormonLvl;
+  if(oyin.gosht<goshtSigim()){oyin.gosht+=oyin.muzLvl;if(oyin.gosht>goshtSigim())oyin.gosht=goshtSigim();}
+  if(oyin.drakonHolat==="tuxum"&&Date.now()>=oyin.tuxumOchilishVaqti){oyin.drakonHolat="tirik";xabar("🎉 Tuxum ochildi! Drakon tug'ildi!");}
+  if(oyin.drakonHolat==="kasal"&&Date.now()>=oyin.kasalTugashVaqti){oyin.drakonHolat="tirik";xabar("💚 Drakon sog'aydi!");}
+  yangila();
+},1000);
+function saqla(){localStorage.setItem("drakonQasri2",JSON.stringify(oyin));}
+function yukla(){const s=localStorage.getItem("drakonQasri2");if(s)oyin=JSON.parse(s);}
+yukla();yangila();
+</script>
 </body>
 </html>
